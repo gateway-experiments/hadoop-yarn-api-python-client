@@ -10,8 +10,8 @@ def get_parser():
     parser = argparse.ArgumentParser(
         description=u'Client for Hadoop® YARN API')
 
-    parser.add_argument('--host', help=u'API host', required=True)
-    parser.add_argument('--port', help=u'API port', required=True)
+    parser.add_argument('--host', help=u'API host')
+    parser.add_argument('--port', help=u'API port')
 
     subparsers = parser.add_subparsers()
     populate_resource_manager_arguments(subparsers)

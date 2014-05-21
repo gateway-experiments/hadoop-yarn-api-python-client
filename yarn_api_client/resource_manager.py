@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from httplib import HTTPConnection, OK
 import json
+import logging
 import urllib
 
 from .errors import APIError
+from .hadoop_conf import get_resource_manager_host_port
 
 
 class Response(object):
@@ -12,8 +14,13 @@ class Response(object):
 
 
 class ResourceManager(object):
-    def __init__(self, address, port=8088, timeout=30):
+    def __init__(self, address=None, port=8088, timeout=30):
+        self.logger = logging.getLogger(__name__)
         self.address, self.port, self.timeout = address, port, timeout
+        if address is None:
+            self.logger.debug(u'get configuration from hadoop conf dif')
+            address, port = get_resource_manager_host_port()
+            self.address, self.port = address, port
         self.http_conn = HTTPConnection(address, port, timeout=timeout)
 
     def cluster_information(self):
