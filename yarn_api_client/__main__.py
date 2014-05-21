@@ -2,6 +2,7 @@
 import argparse
 from pprint import pprint
 
+from .constants import YarnApplicationState, FinalApplicationStatus
 from .resource_manager import ResourceManager
 
 
@@ -42,12 +43,11 @@ def populate_resource_manager_arguments(subparsers):
 
     cas_parser = rm_subparsers.add_parser(
         'apps', help=u'Cluster Applications API')
-    cas_parser.add_argument('--state', action='append', dest='state_list',
-                            help=u'states of the applications')
-    cas_parser.add_argument('--application_type', action='append',
-                            dest='application_type_list',
-                            help=u'types of the applications')
-    cas_parser.add_argument('--final-status')
+    cas_parser.add_argument('--state',
+                            help=u'states of the applications',
+                            choices=dict(YarnApplicationState).keys())
+    cas_parser.add_argument('--final-status',
+                            choices=dict(FinalApplicationStatus).keys())
     cas_parser.add_argument('--user')
     cas_parser.add_argument('--queue')
     cas_parser.add_argument('--limit')
@@ -57,20 +57,9 @@ def populate_resource_manager_arguments(subparsers):
     cas_parser.add_argument('--finished-time-end')
     cas_parser.set_defaults(method='cluster_applications')
     cas_parser.set_defaults(method_kwargs=[
-            'state_list', 'application_type_list', 'user', 'queue', 'limit',
+            'state', 'user', 'queue', 'limit',
             'started_time_begin', 'started_time_end', 'finished_time_begin',
             'finished_time_end', 'final_status'])
-
-    cass_parser = rm_subparsers.add_parser(
-        'apps_stats', help=u'Cluster Application Statistics API')
-    cass_parser.add_argument('--state', action='append', dest='state_list',
-                             help=u'states of the applications')
-    cass_parser.add_argument('--application_type', action='append',
-                             dest='application_type_list',
-                             help=u'types of the applications')
-    cass_parser.set_defaults(method='cluster_application_statistics')
-    cass_parser.set_defaults(method_kwargs=['state_list',
-                                            'application_type_list'])
 
     ca_parser = rm_subparsers.add_parser(
         'app', help=u'Cluster Application API')

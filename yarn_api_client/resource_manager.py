@@ -28,21 +28,14 @@ class ResourceManager(object):
         path = '/ws/v1/cluster/scheduler'
         return self.request(path)
 
-    def cluster_applications(self, state_list=None, final_status=None,
+    def cluster_applications(self, state=None, final_status=None,
                              user=None, queue=None, limit=None,
                              started_time_begin=None, started_time_end=None,
-                             finished_time_begin=None, finished_time_end=None,
-                             application_type_list=None):
+                             finished_time_begin=None, finished_time_end=None):
         path = '/ws/v1/cluster/apps'
 
-        states = ','.join(state_list) if state_list is not None else None
-        if application_type_list is not None:
-            applicationTypes = ','.join(application_type_list)
-        else:
-            applicationTypes = None
-
         loc_args = (
-            ('states', states),
+            ('state', state),
             ('finalStatus', final_status),
             ('user', user),
             ('queue', queue),
@@ -50,14 +43,16 @@ class ResourceManager(object):
             ('startedTimeBegin', started_time_begin),
             ('startedTimeEnd', started_time_end),
             ('finishedTimeBegin', finished_time_begin),
-            ('finishedTimeEnd', finished_time_end),
-            ('applicationTypes', applicationTypes))
+            ('finishedTimeEnd', finished_time_end))
+
         params = {key: value for key, value in loc_args if value is not None}
 
         return self.request(path, **params)
 
     def cluster_application_statistics(self, state_list=None,
                                        application_type_list=None):
+        """This method work in Hadoop > 2.0.0
+        """
         path = '/ws/v1/cluster/appstatistics'
 
         states = ','.join(state_list) if state_list is not None else None
