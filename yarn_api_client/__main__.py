@@ -4,11 +4,12 @@ import logging
 from pprint import pprint
 import sys
 
-from .constants import YarnApplicationState, FinalApplicationStatus
-from .resource_manager import ResourceManager
-from .node_manager import NodeManager
+from .constants import (YarnApplicationState, FinalApplicationStatus,
+                        ApplicationState, JobStateInternal)
+from . import ResourceManager, NodeManager, HistoryServer, ApplicationMaster
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+
 
 def get_parser():
     parser = argparse.ArgumentParser(
@@ -106,7 +107,7 @@ def populate_node_manager_arguments(subparsers):
         'apps', help=u'Applications API')
     nas_parser.add_argument('--state',
                             help=u'application state',
-                            choices=dict(YarnApplicationState).keys())
+                            choices=dict(ApplicationState).keys())
     nas_parser.add_argument('--user',
                             help=u'user name')
     nas_parser.set_defaults(method='node_applications')
@@ -132,11 +133,36 @@ def populate_node_manager_arguments(subparsers):
 def populate_application_master_arguments(subparsers):
     am_parser = subparsers.add_parser(
         'am', help=u'MapReduce Application Master REST API\'s')
+    am_parser.set_defaults(api_class=ApplicationMaster)
+    am_parser.add_argument('application_id')
+
+    # TODO: not implemented
 
 
 def populate_history_server_arguments(subparsers):
     hs_parser = subparsers.add_parser(
         'hs', help=u'History Server REST API\'s')
+    hs_parser.set_defaults(api_class=HistoryServer)
+
+    hs_subparsers = hs_parser.add_subparsers()
+
+    hi_parser = hs_subparsers.add_parser(
+        'info', help=u'History Server Information API')
+    hi_parser.set_defaults(method='application_information')
+
+    hjs_parser = hs_subparsers.add_parser(
+        'jobs', help=u'Jobs API')
+    hjs_parser.add_argument('--state',
+                            help=u'states of the applications',
+                            choices=dict(JobStateInternal).keys())
+    hjs_parser.add_argument('--user')
+    hjs_parser.add_argument('--queue')
+    hjs_parser.add_argument('--limit')
+    hjs_parser.add_argument('--started-time-begin')
+    hjs_parser.add_argument('--started-time-end')
+    hjs_parser.add_argument('--finished-time-begin')
+    hjs_parser.add_argument('--finished-time-end')
+
 
 
 if __name__ == '__main__':
