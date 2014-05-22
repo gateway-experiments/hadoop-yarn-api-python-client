@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 import argparse
+import logging
 from pprint import pprint
+import sys
 
 from .constants import YarnApplicationState, FinalApplicationStatus
 from .resource_manager import ResourceManager
 
+logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 def get_parser():
     parser = argparse.ArgumentParser(

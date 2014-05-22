@@ -1,27 +1,15 @@
 # -*- coding: utf-8 -*-
-from httplib import HTTPConnection, OK
-import json
-import logging
-import urllib
-
-from .errors import APIError
+from .base import BaseYarnAPI
 from .hadoop_conf import get_resource_manager_host_port
 
 
-class Response(object):
-    def __init__(self, http_response):
-        self.data = json.load(http_response)
-
-
-class ResourceManager(object):
+class ResourceManager(BaseYarnAPI):
     def __init__(self, address=None, port=8088, timeout=30):
-        self.logger = logging.getLogger(__name__)
         self.address, self.port, self.timeout = address, port, timeout
         if address is None:
-            self.logger.debug(u'get configuration from hadoop conf dif')
+            self.logger.debug(u'Get configuration from hadoop conf dir')
             address, port = get_resource_manager_host_port()
             self.address, self.port = address, port
-        self.http_conn = HTTPConnection(address, port, timeout=timeout)
 
     def cluster_information(self):
         path = '/ws/v1/cluster/info'
@@ -95,20 +83,3 @@ class ResourceManager(object):
         path = '/ws/v1/cluster/nodes/{nodeid}'.format(nodeid=node_id)
 
         return self.request(path)
-
-    def request(self, api_path, **query_args):
-        params = urllib.urlencode(query_args)
-        if params:
-            path = api_path + '?' + params
-        else:
-            path = api_path
-
-        self.http_conn.request('GET', path)
-
-        response = self.http_conn.getresponse()
-
-        if response.status == OK:
-            return Response(response)
-        else:
-            msg = u'Response finished with status: %s' % response.status
-            raise APIError(msg)
