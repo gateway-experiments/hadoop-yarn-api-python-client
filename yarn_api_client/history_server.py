@@ -57,7 +57,7 @@ class HistoryServer(BaseYarnAPI):
 
         return self.request(path)
 
-    def job_tasks(self, job_id, types=None):
+    def job_tasks(self, job_id, type=None):
         path = '/ws/v1/history/mapreduce/jobs/{jobid}/tasks'.format(
             jobid=job_id)
 
