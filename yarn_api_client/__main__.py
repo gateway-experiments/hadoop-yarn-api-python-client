@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 import argparse
+from functools import partial
 import logging
 from pprint import pprint
 import sys
 
 from .constants import YarnApplicationState, FinalApplicationStatus
 from .resource_manager import ResourceManager
+from .node_manager import NodeManager
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
@@ -93,6 +95,39 @@ def populate_resource_manager_arguments(subparsers):
 def populate_node_manager_arguments(subparsers):
     nm_parser = subparsers.add_parser(
         'nm', help=u'NodeManager REST API\'s')
+    nm_parser.set_defaults(api_class=NodeManager)
+
+    nm_subparsers = nm_parser.add_subparsers()
+
+    ni_parser = nm_subparsers.add_parser(
+        'info', help=u'NodeManager Information API')
+    ni_parser.set_defaults(method='node_information')
+
+    nas_parser = nm_subparsers.add_parser(
+        'apps', help=u'Applications API')
+    nas_parser.add_argument('--state',
+                            help=u'application state',
+                            choices=dict(YarnApplicationState).keys())
+    nas_parser.add_argument('--user',
+                            help=u'user name')
+    nas_parser.set_defaults(method='node_applications')
+    nas_parser.set_defaults(method_kwargs=['state', 'user'])
+
+    na_parser = nm_subparsers.add_parser(
+        'app', help='Application API')
+    na_parser.add_argument('application_id')
+    na_parser.set_defaults(method='node_application')
+    na_parser.set_defaults(method_args=['application_id'])
+
+    ncs_parser = nm_subparsers.add_parser(
+        'containers', help=u'Containers API')
+    ncs_parser.set_defaults(method='node_containers')
+
+    nc_parser = nm_subparsers.add_parser(
+        'container', help=u'Container API')
+    nc_parser.add_argument('container_id')
+    nc_parser.set_defaults(method='node_container')
+    nc_parser.set_defaults(method_args=['container_id'])
 
 
 def populate_application_master_arguments(subparsers):
@@ -109,7 +144,13 @@ if __name__ == '__main__':
     parser = get_parser()
     opts = parser.parse_args()
 
-    api = opts.api_class(opts.host, opts.port)
+    class_kwargs = {}
+    if opts.host is not None:
+        class_kwargs['address'] = opts.host
+    if opts.port is not None:
+        class_kwargs['port'] = opts.port
+
+    api = opts.api_class(**class_kwargs)
     # Construct positional arguments for method
     if 'method_args' in opts:
         method_args = [getattr(opts, arg) for arg in opts.method_args]

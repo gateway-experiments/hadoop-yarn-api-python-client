@@ -3,3 +3,7 @@
 
 class APIError(Exception):
     pass
+
+
+class ConfigurationError(APIError):
+    pass

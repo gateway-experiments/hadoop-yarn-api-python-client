@@ -21,7 +21,7 @@ class NodeManager(BaseYarnAPI):
 
         return self.request(path, **params)
 
-    def node_app(self, application_id):
+    def node_application(self, application_id):
         path = '/ws/v1/node/apps/{appid}'.format(appid=application_id)
 
         return self.request(path)

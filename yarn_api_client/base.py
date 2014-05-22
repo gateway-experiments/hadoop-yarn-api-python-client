@@ -4,7 +4,7 @@ import json
 import logging
 import urllib
 
-from .errors import APIError
+from .errors import APIError, ConfigurationError
 
 
 class Response(object):
@@ -37,6 +37,10 @@ class BaseYarnAPI(object):
     @property
     def http_conn(self):
         if self.__http_conn is None:
+            if self.address is None:
+                raise ConfigurationError(u'API address is not set')
+            elif self.port is None:
+                raise ConfigurationError(u'API port is not set')
             self.__http_conn = HTTPConnection(self.address, self.port,
                                               timeout=self.timeout)
 
