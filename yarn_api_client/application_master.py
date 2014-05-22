@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 from .base import BaseYarnAPI
+from .hadoop_conf import get_webproxy_host_port
 
 
 class ApplicationMaster(BaseYarnAPI):
-    def __init__(self, address=None, port=None, timeout):
+    def __init__(self, address=None, port=8088, timeout=30):
         self.address, self.port, self.timeout = address, port, timeout
+        if address is None:
+            self.logger.debug(u'Get configuration from hadoop conf dir')
+            address, port = get_webproxy_host_port()
+            self.address, self.port = address, port
 
     def application_information(self, application_id):
         path = '/proxy/{appid}/ws/v1/mapreduce/info'.format(
@@ -21,6 +26,8 @@ class ApplicationMaster(BaseYarnAPI):
     def job(self, application_id, job_id):
         path = '/proxy/{appid}/ws/v1/mapreduce/jobs/{jobid}'.format(
             appid=application_id, jobid=job_id)
+
+        return self.request(path)
 
     def job_attempts(self, job_id):
         pass

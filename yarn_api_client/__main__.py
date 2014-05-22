@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import argparse
-from functools import partial
 import logging
 from pprint import pprint
 import sys

@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 from .base import BaseYarnAPI
+from .hadoop_conf import get_jobhistory_host_port
 
 
 class HistoryServer(BaseYarnAPI):
-    def __init__(self, address=None, port=None, timeout):
+    def __init__(self, address=None, port=19888, timeout=30):
         self.address, self.port, self.timeout = address, port, timeout
+        if address is None:
+            self.logger.debug(u'Get information from hadoop conf dir')
+            address, port = get_jobhistory_host_port()
+            self.address, self.port = address, port
 
     def application_information(self):
         path = '/ws/v1/history/info'

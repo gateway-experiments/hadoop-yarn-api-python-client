@@ -16,6 +16,28 @@ def get_resource_manager_host_port():
         return None
 
 
+def get_jobhistory_host_port():
+    config_path = os.path.join(CONF_DIR, 'mapred-site.xml')
+    prop_name = 'mapreduce.jobhistory.webapp.address'
+    value = parse(config_path, prop_name)
+    if value is not None:
+        host, _, port = value.partition(':')
+        return host, port
+    else:
+        return None
+
+
+def get_webproxy_host_port():
+    config_path = os.path.join(CONF_DIR, 'yarn-site.xml')
+    prop_name = 'yarn.web-proxy.address'
+    value = parse(config_path, prop_name)
+    if value is not None:
+        host, _, port = value.partition(':')
+        return host, port
+    else:
+        return get_resource_manager_host_port()
+
+
 def parse(config_path, key):
     tree = ET.parse(config_path)
     root = tree.getroot()
