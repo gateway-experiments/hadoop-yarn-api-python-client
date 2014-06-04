@@ -3,8 +3,8 @@ hadoop-yarn-api-python-client
 
 Python client for Hadoop® YARN API
 
-[![Latest Version](https://pypip.in/version/PYPI_PKG_NAME/badge.png)](https://pypi.python.org/pypi/PYPI_PKG_NAME/)
-[![Downloads](https://pypip.in/download/PYPI_PKG_NAME/badge.png)](https://pypi.python.org/pypi/PYPI_PKG_NAME/)
+[![Latest Version](https://pypip.in/version/yarn-api-client/badge.png)](https://pypi.python.org/pypi/yarn-api-client/)
+[![Downloads](https://pypip.in/download/yarn-api-client/badge.png)](https://pypi.python.org/pypi/yarn-api-client/)
 
 Installation
 ------------
