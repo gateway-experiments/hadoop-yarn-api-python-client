@@ -239,7 +239,7 @@ def populate_history_server_arguments(subparsers):
     htac_parser.set_defaults(method_args=['job_id', 'task_id', 'attempt_id'])
 
 
-if __name__ == '__main__':
+def main():
     parser = get_parser()
     opts = parser.parse_args()
 
@@ -262,3 +262,7 @@ if __name__ == '__main__':
         method_kwargs = {}
     response = getattr(api, opts.method)(*method_args, **method_kwargs)
     pprint(response.data)
+
+
+if __name__ == '__main__':
+    main()

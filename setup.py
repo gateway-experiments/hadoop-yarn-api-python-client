@@ -32,7 +32,7 @@ setup(
     install_requires = install_requires,
     entry_points = {
         'console_scripts': [
-            'yarn_client = yarn_api_client',
+            'yarn_client = yarn_api_client.__main__:main',
         ],
     },
 
