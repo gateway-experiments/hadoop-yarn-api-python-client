@@ -4,9 +4,14 @@ hadoop-yarn-api-python-client
 
 Python client for Hadoop® YARN API
 
+.. image:: https://coveralls.io/repos/toidi/hadoop-yarn-api-python-client/badge.png
+    :target: https://coveralls.io/r/toidi/hadoop-yarn-api-python-client
+    :alt: Test coverage
+
 .. image:: https://pypip.in/version/yarn-api-client/badge.png
     :target: https://pypi.python.org/pypi/yarn-api-client/
     :alt: Latest Version
+
 .. image:: https://pypip.in/download/yarn-api-client/badge.png
     :target: https://pypi.python.org/pypi//yarn-api-client/
     :alt: Downloads
