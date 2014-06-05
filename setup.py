@@ -26,7 +26,7 @@ setup(
     name = 'yarn-api-client',
     version = find_version('yarn_api_client', '__init__.py'),
     description='Python client for Hadoop® YARN API',
-    long_description=read('README.md'),
+    long_description=read('README.rst'),
     packages = find_packages(exclude=['tests']),
 
     install_requires = install_requires,
