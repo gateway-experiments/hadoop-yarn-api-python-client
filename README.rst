@@ -1,46 +1,56 @@
+=============================
 hadoop-yarn-api-python-client
 =============================
 
 Python client for Hadoop® YARN API
 
-[![Latest Version](https://pypip.in/version/yarn-api-client/badge.png)](https://pypi.python.org/pypi/yarn-api-client/)
-[![Downloads](https://pypip.in/download/yarn-api-client/badge.png)](https://pypi.python.org/pypi/yarn-api-client/)
+.. image:: https://pypip.in/version/yarn-api-client/badge.png
+    :target: https://pypi.python.org/pypi/yarn-api-client/
+    :alt: Latest Version
+.. image:: https://pypip.in/download/yarn-api-client/badge.png
+    :target: https://pypi.python.org/pypi//yarn-api-client/
+    :alt: Downloads
 
+------------
 Installation
 ------------
 
 From PyPI
 
-```bash
-pip install yarn-api-client
-```
+::
+
+    pip install yarn-api-client
+
 
 From source code
 
-```bash
-git clone https://github.com/toidi/hadoop-yarn-api-python-client.git
-pushd hadoop-yarn-api-python-client
-python setup.py install
-popd
-```
+::
 
+   git clone https://github.com/toidi/hadoop-yarn-api-python-client.git
+   pushd hadoop-yarn-api-python-client
+   python setup.py install
+   popd
+
+-----
 Usage
 -----
 
-h3. CLI interface
+CLI interface
+=============
 
-```bash
-bin/yarn_client --help
-```
+::
+
+   bin/yarn_client --help
 
 alternative
 
-```bash
-python -m yarn_api_client --help
-```
+::
 
-h3. Programmatic interface
+   python -m yarn_api_client --help
 
-```python
-from yarn_api_client import ApplicationMaster, HistoryServer, NodeManager, ResourceManager
-```
+Programmatic interface
+======================
+
+.. code-block:: python
+
+   from yarn_api_client import ApplicationMaster, HistoryServer, NodeManager, ResourceManager
