@@ -7,6 +7,6 @@ install:
   - pip install coveralls
 # command to run tests
 script:
-  coverage run --source=yarn_api_client /usr/bin/env python2.7 setup.py test
+  coverage run --source=yarn_api_client setup.py test
 after_success:
   coveralls
