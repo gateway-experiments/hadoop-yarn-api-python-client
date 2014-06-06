@@ -4,5 +4,9 @@ python:
 # command to install dependencies
 install:
   - pip install .
+  - pip install coveralls
 # command to run tests
-script: /usr/bin/env python2.7 setup.py test
+script:
+  coverage run --source=yarn_api_client /usr/bin/env python2.7 setup.py test
+after_success:
+  coveralls
