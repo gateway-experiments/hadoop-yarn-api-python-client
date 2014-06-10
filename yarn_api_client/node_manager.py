@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from .base import BaseYarnAPI
+from .constants import ApplicationState
+from .errors import IllegalArgumentError
 
 
 class NodeManager(BaseYarnAPI):
@@ -12,6 +14,11 @@ class NodeManager(BaseYarnAPI):
 
     def node_applications(self, state=None, user=None):
         path = '/ws/v1/node/apps'
+
+        legal_states = set([s for s, _ in ApplicationState])
+        if state is not None and state not in legal_states:
+            msg = 'Application State %s is illegal' % (state,)
+            raise IllegalArgumentError(msg)
 
         loc_args = (
             ('state', state),

@@ -7,3 +7,7 @@ class APIError(Exception):
 
 class ConfigurationError(APIError):
     pass
+
+
+class IllegalArgumentError(APIError):
+    pass
