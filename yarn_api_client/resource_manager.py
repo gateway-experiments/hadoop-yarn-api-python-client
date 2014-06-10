@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from .base import BaseYarnAPI
+from .constants import YarnApplicationState, FinalApplicationStatus
+from .errors import IllegalArgumentError
 from .hadoop_conf import get_resource_manager_host_port
 
 
@@ -29,6 +31,16 @@ class ResourceManager(BaseYarnAPI):
                              finished_time_begin=None, finished_time_end=None):
         path = '/ws/v1/cluster/apps'
 
+        legal_states = set([s for s, _ in YarnApplicationState])
+        if state is not None and state not in legal_states:
+            msg = u'Yarn Application State %s is illegal' % (state,)
+            raise IllegalArgumentError(msg)
+
+        legal_final_statuses = set([s for s, _ in FinalApplicationStatus])
+        if final_status is not None and final_status not in legal_final_statuses:
+            msg = u'Final Application Status %s is illegal' % (final_status,)
+            raise IllegalArgumentError(msg)
+
         loc_args = (
             ('state', state),
             ('finalStatus', final_status),
@@ -50,6 +62,7 @@ class ResourceManager(BaseYarnAPI):
         """
         path = '/ws/v1/cluster/appstatistics'
 
+        # TODO: validate state argument
         states = ','.join(state_list) if state_list is not None else None
         if application_type_list is not None:
             applicationTypes = ','.join(application_type_list)
@@ -76,8 +89,20 @@ class ResourceManager(BaseYarnAPI):
 
     def cluster_nodes(self, state=None, healthy=None):
         path = '/ws/v1/cluster/nodes'
+        # TODO: validate state argument
 
-        return self.request(path)
+        legal_healthy = ['true', 'false']
+        if healthy is not None and healthy not in legal_healthy:
+            msg = u'Valid Healthy arguments are true, false'
+            raise IllegalArgumentError(msg)
+
+        loc_args = (
+            ('state', state),
+            ('healthy', healthy),
+        )
+        params = {key: value for key, value in loc_args if value is not None}
+
+        return self.request(path, **params)
 
     def cluster_node(self, node_id):
         path = '/ws/v1/cluster/nodes/{nodeid}'.format(nodeid=node_id)

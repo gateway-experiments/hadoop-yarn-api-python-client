@@ -1,0 +1,78 @@
+# -*- coding: utf-8 -*-
+from mock import patch
+from unittest import TestCase
+
+from yarn_api_client.resource_manager import ResourceManager
+from yarn_api_client.errors import IllegalArgumentError
+
+
+@patch('yarn_api_client.resource_manager.ResourceManager.request')
+class ResourceManagerTestCase(TestCase):
+    def setUp(self):
+        self.rm = ResourceManager('localhost')
+
+    @patch('yarn_api_client.resource_manager.get_resource_manager_host_port')
+    def test__init__(self, get_config_mock, request_mock):
+        get_config_mock.return_value = (None, None)
+        ResourceManager()
+        get_config_mock.assert_called_with()
+
+    def test_cluster_information(self, request_mock):
+        self.rm.cluster_information()
+        request_mock.assert_called_with('/ws/v1/cluster/info')
+
+    def test_cluster_metrics(self, request_mock):
+        self.rm.cluster_metrics()
+        request_mock.assert_called_with('/ws/v1/cluster/metrics')
+
+    def test_cluster_scheduler(self, request_mock):
+        self.rm.cluster_scheduler()
+        request_mock.assert_called_with('/ws/v1/cluster/scheduler')
+
+    def test_cluster_applications(self, request_mock):
+        self.rm.cluster_applications()
+        request_mock.assert_called_with('/ws/v1/cluster/apps')
+
+        self.rm.cluster_applications(state='KILLED', final_status='FAILED',
+                                     user='root', queue='low', limit=10,
+                                     started_time_begin=1, started_time_end=2,
+                                     finished_time_begin=3, finished_time_end=4)
+        request_mock.assert_called_with('/ws/v1/cluster/apps', state='KILLED',
+                                        finalStatus='FAILED', user='root',
+                                        queue='low', limit=10,
+                                        startedTimeBegin=1, startedTimeEnd=2,
+                                        finishedTimeBegin=3, finishedTimeEnd=4)
+
+        with self.assertRaises(IllegalArgumentError):
+            self.rm.cluster_applications(state='ololo')
+
+        with self.assertRaises(IllegalArgumentError):
+            self.rm.cluster_applications(final_status='ololo')
+
+    def test_cluster_application_statistics(self, request_mock):
+        self.rm.cluster_application_statistics()
+        request_mock.assert_called_with('/ws/v1/cluster/appstatistics')
+        # TODO: test arguments
+
+    def test_cluster_application(self, request_mock):
+        self.rm.cluster_application('app_1')
+        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1')
+
+    def test_cluster_application_attempts(self, request_mock):
+        self.rm.cluster_application_attempts('app_1')
+        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/appattempts')
+
+    def test_cluster_nodes(self, request_mock):
+        self.rm.cluster_nodes()
+        request_mock.assert_called_with('/ws/v1/cluster/nodes')
+
+        self.rm.cluster_nodes(state='NEW', healthy='true')
+        request_mock.assert_called_with('/ws/v1/cluster/nodes',
+                                        state='NEW', healthy='true')
+
+        with self.assertRaises(IllegalArgumentError):
+            self.rm.cluster_nodes(state='NEW', healthy='ololo')
+
+    def test_cluster_node(self, request_mock):
+        self.rm.cluster_node('node_1')
+        request_mock.assert_called_with('/ws/v1/cluster/nodes/node_1')
