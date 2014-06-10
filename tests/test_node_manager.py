@@ -20,6 +20,9 @@ class NodeManagerTestCase(TestCase):
         request_mock.assert_called_with('/ws/v1/node/apps',
                                         state='RUNNING', user='root')
 
+        self.nm.node_applications()
+        request_mock.assert_called_with('/ws/v1/node/apps')
+
         with self.assertRaises(IllegalArgumentError):
             self.nm.node_applications('ololo', 'root')
 

@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from .base import BaseYarnAPI
+from .constants import JobStateInternal
+from .errors import IllegalArgumentError
 from .hadoop_conf import get_jobhistory_host_port
 
 
@@ -20,6 +22,11 @@ class HistoryServer(BaseYarnAPI):
              started_time_begin=None, started_time_end=None,
              finished_time_begin=None, finished_time_end=None):
         path = '/ws/v1/history/mapreduce/jobs'
+
+        legal_states = set([s for s, _ in JobStateInternal])
+        if state is not None and state not in legal_states:
+            msg = 'Job Internal State %s is illegal' % (state,)
+            raise IllegalArgumentError(msg)
 
         loc_args = (
             ('state', state),
@@ -61,9 +68,16 @@ class HistoryServer(BaseYarnAPI):
         path = '/ws/v1/history/mapreduce/jobs/{jobid}/tasks'.format(
             jobid=job_id)
 
+        # m - for map
+        # r - for reduce
+        valid_types = ['m', 'r']
+        if type is not None and type not in valid_types:
+            msg = 'Job type %s is illegal' % (type,)
+            raise IllegalArgumentError(msg)
+
         params = {}
-        if types is not None:
-            params['types'] = types
+        if type is not None:
+            params['types'] = type
 
         return self.request(path, **params)
 

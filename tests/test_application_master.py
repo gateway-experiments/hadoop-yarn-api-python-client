@@ -28,7 +28,7 @@ class AppMasterTestCase(TestCase):
         self.app.job('app_100500', 'job_100500')
         request_mock.assert_called_with('/proxy/app_100500/ws/v1/mapreduce/jobs/job_100500')
 
-    def test_attempts(self, request_mock):
+    def test_job_attempts(self, request_mock):
         self.app.job_attempts('app_1')
 
     def test_job_counters(self, request_mock):
