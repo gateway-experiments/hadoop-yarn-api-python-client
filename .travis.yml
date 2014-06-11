@@ -3,10 +3,12 @@ python:
   - "2.7"
 # command to install dependencies
 install:
-  - pip install .
-  - pip install coveralls
+  - pip install pip coveralls
 # command to run tests
 script:
-  coverage run --source=yarn_api_client setup.py test
+  tox
+env:
+  - TOXENV=py26
+  - TOXENV=py27
 after_success:
   coveralls
