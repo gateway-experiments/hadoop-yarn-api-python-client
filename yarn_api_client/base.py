@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 try:
     from httplib import HTTPConnection, OK
 except ImportError:
@@ -28,7 +29,7 @@ class BaseYarnAPI(object):
         else:
             path = api_path
 
-        self.logger.info(u'Request http://%s:%s%s', self.address, self.port, path)
+        self.logger.info('Request http://%s:%s%s', self.address, self.port, path)
         self.http_conn.request('GET', path)
 
         response = self.http_conn.getresponse()
@@ -36,7 +37,7 @@ class BaseYarnAPI(object):
         if response.status == OK:
             return self.response_class(response)
         else:
-            msg = u'Response finished with status: %s' % response.status
+            msg = 'Response finished with status: %s' % response.status
             raise APIError(msg)
 
     def construct_parameters(self, arguments):
@@ -49,9 +50,9 @@ class BaseYarnAPI(object):
     def http_conn(self):
         if self.__http_conn is None:
             if self.address is None:
-                raise ConfigurationError(u'API address is not set')
+                raise ConfigurationError('API address is not set')
             elif self.port is None:
-                raise ConfigurationError(u'API port is not set')
+                raise ConfigurationError('API port is not set')
             self.__http_conn = HTTPConnection(self.address, self.port,
                                               timeout=self.timeout)
 

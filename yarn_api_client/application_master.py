@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 from .base import BaseYarnAPI
 from .hadoop_conf import get_webproxy_host_port
 
@@ -7,7 +8,7 @@ class ApplicationMaster(BaseYarnAPI):
     def __init__(self, address=None, port=8088, timeout=30):
         self.address, self.port, self.timeout = address, port, timeout
         if address is None:
-            self.logger.debug(u'Get configuration from hadoop conf dir')
+            self.logger.debug('Get configuration from hadoop conf dir')
             address, port = get_webproxy_host_port()
             self.address, self.port = address, port
 

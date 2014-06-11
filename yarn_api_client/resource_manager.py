@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 from .base import BaseYarnAPI
 from .constants import YarnApplicationState, FinalApplicationStatus
 from .errors import IllegalArgumentError
@@ -9,7 +10,7 @@ class ResourceManager(BaseYarnAPI):
     def __init__(self, address=None, port=8088, timeout=30):
         self.address, self.port, self.timeout = address, port, timeout
         if address is None:
-            self.logger.debug(u'Get configuration from hadoop conf dir')
+            self.logger.debug('Get configuration from hadoop conf dir')
             address, port = get_resource_manager_host_port()
             self.address, self.port = address, port
 
@@ -33,12 +34,12 @@ class ResourceManager(BaseYarnAPI):
 
         legal_states = set([s for s, _ in YarnApplicationState])
         if state is not None and state not in legal_states:
-            msg = u'Yarn Application State %s is illegal' % (state,)
+            msg = 'Yarn Application State %s is illegal' % (state,)
             raise IllegalArgumentError(msg)
 
         legal_final_statuses = set([s for s, _ in FinalApplicationStatus])
         if final_status is not None and final_status not in legal_final_statuses:
-            msg = u'Final Application Status %s is illegal' % (final_status,)
+            msg = 'Final Application Status %s is illegal' % (final_status,)
             raise IllegalArgumentError(msg)
 
         loc_args = (
@@ -93,7 +94,7 @@ class ResourceManager(BaseYarnAPI):
 
         legal_healthy = ['true', 'false']
         if healthy is not None and healthy not in legal_healthy:
-            msg = u'Valid Healthy arguments are true, false'
+            msg = 'Valid Healthy arguments are true, false'
             raise IllegalArgumentError(msg)
 
         loc_args = (

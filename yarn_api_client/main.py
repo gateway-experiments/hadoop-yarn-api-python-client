@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 import argparse
 import logging
 from pprint import pprint
@@ -13,10 +14,10 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 def get_parser():
     parser = argparse.ArgumentParser(
-        description=u'Client for Hadoop® YARN API')
+        description='Client for Hadoop® YARN API')
 
-    parser.add_argument('--host', help=u'API host')
-    parser.add_argument('--port', help=u'API port')
+    parser.add_argument('--host', help='API host')
+    parser.add_argument('--port', help='API port')
 
     subparsers = parser.add_subparsers()
     populate_resource_manager_arguments(subparsers)
@@ -29,27 +30,27 @@ def get_parser():
 
 def populate_resource_manager_arguments(subparsers):
     rm_parser = subparsers.add_parser(
-        'rm', help=u'ResourceManager REST API\'s')
+        'rm', help='ResourceManager REST API\'s')
     rm_parser.set_defaults(api_class=ResourceManager)
 
     rm_subparsers = rm_parser.add_subparsers()
 
     ci_parser = rm_subparsers.add_parser(
-        'info', help=u'Cluster Information API')
+        'info', help='Cluster Information API')
     ci_parser.set_defaults(method='cluster_information')
 
     cm_parser = rm_subparsers.add_parser(
-        'metrics', help=u'Cluster Metrics API')
+        'metrics', help='Cluster Metrics API')
     cm_parser.set_defaults(method='cluster_metrics')
 
     cs_parser = rm_subparsers.add_parser(
-        'scheduler', help=u'Cluster Scheduler API')
+        'scheduler', help='Cluster Scheduler API')
     cs_parser.set_defaults(method='cluster_scheduler')
 
     cas_parser = rm_subparsers.add_parser(
-        'apps', help=u'Cluster Applications API')
+        'apps', help='Cluster Applications API')
     cas_parser.add_argument('--state',
-                            help=u'states of the applications',
+                            help='states of the applications',
                             choices=dict(YarnApplicationState).keys())
     cas_parser.add_argument('--final-status',
                             choices=dict(FinalApplicationStatus).keys())
@@ -67,26 +68,26 @@ def populate_resource_manager_arguments(subparsers):
             'finished_time_end', 'final_status'])
 
     ca_parser = rm_subparsers.add_parser(
-        'app', help=u'Cluster Application API')
+        'app', help='Cluster Application API')
     ca_parser.add_argument('application_id')
     ca_parser.set_defaults(method='cluster_application')
     ca_parser.set_defaults(method_args=['application_id'])
 
     caa_parser = rm_subparsers.add_parser(
-        'app_attempts', help=u'Cluster Application Attempts API')
+        'app_attempts', help='Cluster Application Attempts API')
     caa_parser.add_argument('application_id')
     caa_parser.set_defaults(method='cluster_application_attempts')
     caa_parser.set_defaults(method_args=['application_id'])
 
     cns_parser = rm_subparsers.add_parser(
-        'nodes', help=u'Cluster Nodes API')
-    cns_parser.add_argument('--state', help=u'the state of the node')
+        'nodes', help='Cluster Nodes API')
+    cns_parser.add_argument('--state', help='the state of the node')
     cns_parser.add_argument('--healthy', help='true or false')
     cns_parser.set_defaults(method='cluster_nodes')
     cns_parser.set_defaults(method_kargs=['state', 'healthy'])
 
     cn_parser = rm_subparsers.add_parser(
-        'node', help=u'Cluster Node API')
+        'node', help='Cluster Node API')
     cn_parser.add_argument('node_id')
     cn_parser.set_defaults(method='cluster_node')
     cn_parser.set_defaults(method_args=['node_id'])
@@ -94,22 +95,22 @@ def populate_resource_manager_arguments(subparsers):
 
 def populate_node_manager_arguments(subparsers):
     nm_parser = subparsers.add_parser(
-        'nm', help=u'NodeManager REST API\'s')
+        'nm', help='NodeManager REST API\'s')
     nm_parser.set_defaults(api_class=NodeManager)
 
     nm_subparsers = nm_parser.add_subparsers()
 
     ni_parser = nm_subparsers.add_parser(
-        'info', help=u'NodeManager Information API')
+        'info', help='NodeManager Information API')
     ni_parser.set_defaults(method='node_information')
 
     nas_parser = nm_subparsers.add_parser(
-        'apps', help=u'Applications API')
+        'apps', help='Applications API')
     nas_parser.add_argument('--state',
-                            help=u'application state',
+                            help='application state',
                             choices=dict(ApplicationState).keys())
     nas_parser.add_argument('--user',
-                            help=u'user name')
+                            help='user name')
     nas_parser.set_defaults(method='node_applications')
     nas_parser.set_defaults(method_kwargs=['state', 'user'])
 
@@ -120,11 +121,11 @@ def populate_node_manager_arguments(subparsers):
     na_parser.set_defaults(method_args=['application_id'])
 
     ncs_parser = nm_subparsers.add_parser(
-        'containers', help=u'Containers API')
+        'containers', help='Containers API')
     ncs_parser.set_defaults(method='node_containers')
 
     nc_parser = nm_subparsers.add_parser(
-        'container', help=u'Container API')
+        'container', help='Container API')
     nc_parser.add_argument('container_id')
     nc_parser.set_defaults(method='node_container')
     nc_parser.set_defaults(method_args=['container_id'])
@@ -132,7 +133,7 @@ def populate_node_manager_arguments(subparsers):
 
 def populate_application_master_arguments(subparsers):
     am_parser = subparsers.add_parser(
-        'am', help=u'MapReduce Application Master REST API\'s')
+        'am', help='MapReduce Application Master REST API\'s')
     am_parser.set_defaults(api_class=ApplicationMaster)
     am_parser.add_argument('application_id')
 
@@ -141,19 +142,19 @@ def populate_application_master_arguments(subparsers):
 
 def populate_history_server_arguments(subparsers):
     hs_parser = subparsers.add_parser(
-        'hs', help=u'History Server REST API\'s')
+        'hs', help='History Server REST API\'s')
     hs_parser.set_defaults(api_class=HistoryServer)
 
     hs_subparsers = hs_parser.add_subparsers()
 
     hi_parser = hs_subparsers.add_parser(
-        'info', help=u'History Server Information API')
+        'info', help='History Server Information API')
     hi_parser.set_defaults(method='application_information')
 
     hjs_parser = hs_subparsers.add_parser(
-        'jobs', help=u'Jobs API')
+        'jobs', help='Jobs API')
     hjs_parser.add_argument('--state',
-                            help=u'states of the applications',
+                            help='states of the applications',
                             choices=dict(JobStateInternal).keys())
     hjs_parser.add_argument('--user')
     hjs_parser.add_argument('--queue')
@@ -168,62 +169,62 @@ def populate_history_server_arguments(subparsers):
             'started_time_begin', 'started_time_end', 'finished_time_begin',
             'finished_time_end'])
 
-    hj_parser = hs_subparsers.add_parser('job', help=u'Job API')
+    hj_parser = hs_subparsers.add_parser('job', help='Job API')
     hj_parser.add_argument('job_id')
     hj_parser.set_defaults(method='job')
     hj_parser.set_defaults(method_args=['job_id'])
 
     hja_parser = hs_subparsers.add_parser(
-        'job_attempts', help=u'Job Attempts API')
+        'job_attempts', help='Job Attempts API')
     hja_parser.add_argument('job_id')
     hja_parser.set_defaults(method='job_attempts')
     hja_parser.set_defaults(method_args=['job_id'])
 
     hjc_parser = hs_subparsers.add_parser(
-        'job_counters', help=u'Job Counters API')
+        'job_counters', help='Job Counters API')
     hjc_parser.add_argument('job_id')
     hjc_parser.set_defaults(method='job_counters')
     hjc_parser.set_defaults(method_args=['job_id'])
 
     hjcn_parser = hs_subparsers.add_parser(
-        'job_conf', help=u'Job Conf API')
+        'job_conf', help='Job Conf API')
     hjcn_parser.add_argument('job_id')
     hjcn_parser.set_defaults(method='job_conf')
     hjcn_parser.set_defaults(method_args=['job_id'])
 
     hts_parser = hs_subparsers.add_parser(
-        'tasks', help=u'Tasks API')
+        'tasks', help='Tasks API')
     hts_parser.add_argument('job_id')
     hts_parser.add_argument('--type', choices=['m', 'r'],
-                            help=(u'type of task, m for map task '
-                                  u'or r for reduce task.'))
+                            help=('type of task, m for map task '
+                                  'or r for reduce task.'))
     hts_parser.set_defaults(method='job_tasks')
     hts_parser.set_defaults(method_args=['job_id'])
     hts_parser.set_defaults(method_kwargs=['type'])
 
     ht_parser = hs_subparsers.add_parser(
-        'task', help=u'Task API')
+        'task', help='Task API')
     ht_parser.add_argument('job_id')
     ht_parser.add_argument('task_id')
     ht_parser.set_defaults(method='job_task')
     ht_parser.set_defaults(method_args=['job_id', 'task_id'])
 
     htc_parser = hs_subparsers.add_parser(
-        'task_counters', help=u'Task Counters API')
+        'task_counters', help='Task Counters API')
     htc_parser.add_argument('job_id')
     htc_parser.add_argument('task_id')
     htc_parser.set_defaults(method='task_counters')
     htc_parser.set_defaults(method_args=['job_id', 'task_id'])
 
     htas_parser = hs_subparsers.add_parser(
-        'task_attempts', help=u'Task Attempts API')
+        'task_attempts', help='Task Attempts API')
     htas_parser.add_argument('job_id')
     htas_parser.add_argument('task_id')
     htas_parser.set_defaults(method='task_attempts')
     htas_parser.set_defaults(method_args=['job_id', 'task_id'])
 
     hta_parser = hs_subparsers.add_parser(
-        'task_attempt', help=u'Task Attempt API')
+        'task_attempt', help='Task Attempt API')
     hta_parser.add_argument('job_id')
     hta_parser.add_argument('task_id')
     hta_parser.add_argument('attempt_id')
@@ -231,7 +232,7 @@ def populate_history_server_arguments(subparsers):
     hta_parser.set_defaults(method_args=['job_id', 'task_id', 'attempt_id'])
 
     htac_parser = hs_subparsers.add_parser(
-        'task_attempt_counters', help=u'Task Attempt Counters API')
+        'task_attempt_counters', help='Task Attempt Counters API')
     htac_parser.add_argument('job_id')
     htac_parser.add_argument('task_id')
     htac_parser.add_argument('attempt_id')
