@@ -2,11 +2,11 @@
 from tempfile import NamedTemporaryFile
 
 from mock import patch
-from . import TestCase
+from tests import TestCase
 
 from yarn_api_client import hadoop_conf
 
-empty_config = '<configuration></configuration>'
+empty_config = '<configuration></configuration>'.encode('latin1')
 
 yarn_site_xml = """\
 <configuration>
@@ -15,7 +15,7 @@ yarn_site_xml = """\
     <value>localhost:8022</value>
   </property>
 </configuration>
-"""
+""".encode('latin1')
 
 
 class HadoopConfTestCase(TestCase):

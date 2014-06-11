@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
-from httplib import HTTPConnection, OK
+try:
+    from httplib import HTTPConnection, OK
+except ImportError:
+    from http.client import HTTPConnection, OK
 import json
 import logging
-import urllib
+try:
+    from urllib import urlencode
+except ImportError:
+    from urllib.parse import urlencode
 
 from .errors import APIError, ConfigurationError
 
@@ -16,7 +22,7 @@ class BaseYarnAPI(object):
     response_class = Response
 
     def request(self, api_path, **query_args):
-        params = urllib.urlencode(query_args)
+        params = urlencode(query_args)
         if params:
             path = api_path + '?' + params
         else:

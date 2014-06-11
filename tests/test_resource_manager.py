@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from mock import patch
-from . import TestCase
+from tests import TestCase
 
 from yarn_api_client.resource_manager import ResourceManager
 from yarn_api_client.errors import IllegalArgumentError

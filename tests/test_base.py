@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
-from httplib import OK
+try:
+    from httplib import OK
+except ImportError:
+    from http.client import OK
 
 from mock import patch
-from . import TestCase
+from tests import TestCase
 
 from yarn_api_client import base
 from yarn_api_client.errors import APIError, ConfigurationError

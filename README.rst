@@ -20,6 +20,10 @@ Python client for Hadoop® YARN API
     :target: https://travis-ci.org/toidi/hadoop-yarn-api-python-client
     :alt: Travis CI build status
 
+.. image:: https://caniusepython3.com/project/yarn-api-client.svg
+    :target: https://caniusepython3.com/project/yarn-api-client
+    :alt: Python 3 port
+
 ------------
 Installation
 ------------

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from mock import patch, PropertyMock
-from . import TestCase
+from tests import TestCase
 
 import yarn_api_client.main as m
 
