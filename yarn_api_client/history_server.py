@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 from .base import BaseYarnAPI
 from .constants import JobStateInternal
 from .errors import IllegalArgumentError
@@ -9,7 +10,7 @@ class HistoryServer(BaseYarnAPI):
     def __init__(self, address=None, port=19888, timeout=30):
         self.address, self.port, self.timeout = address, port, timeout
         if address is None:
-            self.logger.debug(u'Get information from hadoop conf dir')
+            self.logger.debug('Get information from hadoop conf dir')
             address, port = get_jobhistory_host_port()
             self.address, self.port = address, port
 
