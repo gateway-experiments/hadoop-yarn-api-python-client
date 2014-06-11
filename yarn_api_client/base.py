@@ -33,6 +33,11 @@ class BaseYarnAPI(object):
             msg = u'Response finished with status: %s' % response.status
             raise APIError(msg)
 
+    def construct_parameters(self, arguments):
+        params = dict((key, value) for key, value in arguments if value is not None)
+        return params
+
+
     __http_conn = None
     @property
     def http_conn(self):

@@ -38,7 +38,7 @@ class HistoryServer(BaseYarnAPI):
             ('finishedTimeBegin', finished_time_begin),
             ('finishedTimeEnd', finished_time_end))
 
-        params = {key: value for key, value in loc_args if value is not None}
+        params = self.construct_parameters(loc_args)
 
         return self.request(path, **params)
 

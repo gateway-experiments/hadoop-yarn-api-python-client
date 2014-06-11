@@ -42,9 +42,9 @@ def parse(config_path, key):
     tree = ET.parse(config_path)
     root = tree.getroot()
     # Construct list with profit values
-    ph1 = [{el.tag: el.text for el in p} for p in root.findall('./property')]
+    ph1 = [dict((el.tag, el.text) for el in p) for p in root.findall('./property')]
     # Construct dict with property key values
-    ph2 = {obj['name']: obj['value'] for obj in ph1}
+    ph2 = dict((obj['name'], obj['value']) for obj in ph1)
 
     value = ph2.get(key, None)
     return value

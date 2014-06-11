@@ -24,7 +24,7 @@ class NodeManager(BaseYarnAPI):
             ('state', state),
             ('user', user))
 
-        params = {key: value for key, value in loc_args if value is not None}
+        params = self.construct_parameters(loc_args)
 
         return self.request(path, **params)
 
