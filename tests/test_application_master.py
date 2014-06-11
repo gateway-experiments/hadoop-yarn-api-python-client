@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from mock import patch
-from unittest import TestCase
+from . import TestCase
 
 from yarn_api_client.application_master import ApplicationMaster
 

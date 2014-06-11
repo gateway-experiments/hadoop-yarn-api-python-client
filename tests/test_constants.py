@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from unittest import TestCase
+from . import TestCase
 
 from yarn_api_client import constants
 

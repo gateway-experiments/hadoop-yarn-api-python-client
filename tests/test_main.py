@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from mock import patch, PropertyMock
-from unittest import TestCase
+from . import TestCase
 
-import yarn_api_client.__main__ as m
+import yarn_api_client.main as m
 
 
 class MainTestCase(TestCase):
