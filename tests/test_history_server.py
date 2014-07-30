@@ -58,7 +58,7 @@ class HistoryServerTestCase(TestCase):
         self.hs.job_tasks('job_2')
         request_mock.assert_called_with('/ws/v1/history/mapreduce/jobs/job_2/tasks')
         self.hs.job_tasks('job_2', type='m')
-        request_mock.assert_called_with('/ws/v1/history/mapreduce/jobs/job_2/tasks', types='m')
+        request_mock.assert_called_with('/ws/v1/history/mapreduce/jobs/job_2/tasks', type='m')
 
         with self.assertRaises(IllegalArgumentError):
             self.hs.job_tasks('job_2', type='ololo')

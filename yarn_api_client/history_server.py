@@ -78,7 +78,7 @@ class HistoryServer(BaseYarnAPI):
 
         params = {}
         if type is not None:
-            params['types'] = type
+            params['type'] = type
 
         return self.request(path, **params)
 
