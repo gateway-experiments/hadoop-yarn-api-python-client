@@ -54,8 +54,7 @@ class ApplicationMaster(BaseYarnAPI):
     def job_attempts(self, job_id):
         """
         With the job attempts API, you can obtain a collection of resources
-        that represent the job attempts. When you run a GET operation on this
-        resource, you obtain a collection of Job Attempt Objects.
+        that represent the job attempts.
         """
         pass
 
@@ -82,8 +81,7 @@ class ApplicationMaster(BaseYarnAPI):
     def job_tasks(self, application_id, job_id):
         """
         With the tasks API, you can obtain a collection of resources that
-        represent all the tasks for a job. When you run a GET operation on
-        this resource, you obtain a collection of Task Objects.
+        represent all the tasks for a job.
         """
         path = '/proxy/{appid}/ws/v1/mapreduce/jobs/{jobid}/tasks'.format(
             appid=application_id, jobid=job_id)
@@ -114,8 +112,6 @@ class ApplicationMaster(BaseYarnAPI):
         """
         With the task attempts API, you can obtain a collection of resources
         that represent a task attempt within a job.
-        When you run a GET operation on this resource, you obtain a collection
-        of Task Attempt Objects.
         """
         path = '/proxy/{appid}/ws/v1/mapreduce/jobs/{jobid}/tasks/{taskid}/attempts'.format(
             appid=application_id, jobid=job_id, taskid=task_id)
