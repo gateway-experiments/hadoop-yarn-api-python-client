@@ -24,6 +24,10 @@ Python client for Hadoop® YARN API
     :target: https://caniusepython3.com/project/yarn-api-client
     :alt: Python 3 port
 
+Package documentation: python-client-for-hadoop-yarn-api.readthedocs.org_
+
+REST API documentation: hadoop.apache.org_
+
 ------------
 Installation
 ------------
@@ -67,3 +71,6 @@ Programmatic interface
 .. code-block:: python
 
    from yarn_api_client import ApplicationMaster, HistoryServer, NodeManager, ResourceManager
+
+.. _python-client-for-hadoop-yarn-api.readthedocs.org: http://python-client-for-hadoop-yarn-api.readthedocs.org/en/latest/
+.. _hadoop.apache.org: http://hadoop.apache.org/docs/stable/hadoop-yarn/hadoop-yarn-site/WebServicesIntro.html
