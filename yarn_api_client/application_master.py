@@ -11,6 +11,13 @@ class ApplicationMaster(BaseYarnAPI):
     equivalent to a running MapReduce job. The information includes the jobs
     the app master is running and all the job particulars like tasks,
     counters, configuration, attempts, etc.
+
+    If `address` argument is `None` client will try to extract `address` and
+    `port` from Hadoop configuration files.
+
+    :param str address: Proxy HTTP address
+    :param int port: Proxy HTTP port
+    :param int timeout: API connection timeout in seconds
     """
     def __init__(self, address=None, port=8088, timeout=30):
         self.address, self.port, self.timeout = address, port, timeout
@@ -24,6 +31,9 @@ class ApplicationMaster(BaseYarnAPI):
         The MapReduce application master information resource provides overall
         information about that mapreduce application master.
         This includes application id, time it was started, user, name, etc.
+
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/proxy/{appid}/ws/v1/mapreduce/info'.format(
             appid=application_id)
@@ -34,6 +44,10 @@ class ApplicationMaster(BaseYarnAPI):
         """
         The jobs resource provides a list of the jobs running on this
         application master.
+
+        :param str application_id: The application id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/proxy/{appid}/ws/v1/mapreduce/jobs'.format(
             appid=application_id)
@@ -45,6 +59,11 @@ class ApplicationMaster(BaseYarnAPI):
         A job resource contains information about a particular job that was
         started by this application master. Certain fields are only accessible
         if user has permissions - depends on acl settings.
+
+        :param str application_id: The application id
+        :param str job_id: The job id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/proxy/{appid}/ws/v1/mapreduce/jobs/{jobid}'.format(
             appid=application_id, jobid=job_id)
@@ -55,6 +74,10 @@ class ApplicationMaster(BaseYarnAPI):
         """
         With the job attempts API, you can obtain a collection of resources
         that represent the job attempts.
+
+        :param str job_id: The job id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         pass
 
@@ -62,6 +85,11 @@ class ApplicationMaster(BaseYarnAPI):
         """
         With the job counters API, you can object a collection of resources
         that represent all the counters for that job.
+
+        :param str application_id: The application id
+        :param str job_id: The job id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/proxy/{appid}/ws/v1/mapreduce/jobs/{jobid}/counters'.format(
             appid=application_id, jobid=job_id)
@@ -72,6 +100,11 @@ class ApplicationMaster(BaseYarnAPI):
         """
         A job configuration resource contains information about the job
         configuration for this job.
+
+        :param str application_id: The application id
+        :param str job_id: The job id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/proxy/{appid}/ws/v1/mapreduce/jobs/{jobid}/conf'.format(
             appid=application_id, jobid=job_id)
@@ -82,6 +115,11 @@ class ApplicationMaster(BaseYarnAPI):
         """
         With the tasks API, you can obtain a collection of resources that
         represent all the tasks for a job.
+
+        :param str application_id: The application id
+        :param str job_id: The job id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/proxy/{appid}/ws/v1/mapreduce/jobs/{jobid}/tasks'.format(
             appid=application_id, jobid=job_id)
@@ -92,6 +130,12 @@ class ApplicationMaster(BaseYarnAPI):
         """
         A Task resource contains information about a particular
         task within a job.
+
+        :param str application_id: The application id
+        :param str job_id: The job id
+        :param str task_id: The task id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/proxy/{appid}/ws/v1/mapreduce/jobs/{jobid}/tasks/{taskid}'.format(
             appid=application_id, jobid=job_id, taskid=task_id)
@@ -102,6 +146,12 @@ class ApplicationMaster(BaseYarnAPI):
         """
         With the task counters API, you can object a collection of resources
         that represent all the counters for that task.
+
+        :param str application_id: The application id
+        :param str job_id: The job id
+        :param str task_id: The task id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/proxy/{appid}/ws/v1/mapreduce/jobs/{jobid}/tasks/{taskid}/counters'.format(
             appid=application_id, jobid=job_id, taskid=task_id)
@@ -112,6 +162,12 @@ class ApplicationMaster(BaseYarnAPI):
         """
         With the task attempts API, you can obtain a collection of resources
         that represent a task attempt within a job.
+
+        :param str application_id: The application id
+        :param str job_id: The job id
+        :param str task_id: The task id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/proxy/{appid}/ws/v1/mapreduce/jobs/{jobid}/tasks/{taskid}/attempts'.format(
             appid=application_id, jobid=job_id, taskid=task_id)
@@ -122,6 +178,13 @@ class ApplicationMaster(BaseYarnAPI):
         """
         A Task Attempt resource contains information about a particular task
         attempt within a job.
+
+        :param str application_id: The application id
+        :param str job_id: The job id
+        :param str task_id: The task id
+        :param str attempt_id: The attempt id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/proxy/{appid}/ws/v1/mapreduce/jobs/{jobid}/tasks/{taskid}/attempt/{attemptid}'.format(
             appid=application_id, jobid=job_id, taskid=task_id,
@@ -133,6 +196,13 @@ class ApplicationMaster(BaseYarnAPI):
         """
         With the task attempt counters API, you can object a collection
         of resources that represent al the counters for that task attempt.
+
+        :param str application_id: The application id
+        :param str job_id: The job id
+        :param str task_id: The task id
+        :param str attempt_id: The attempt id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/proxy/{appid}/ws/v1/mapreduce/jobs/{jobid}/tasks/{taskid}/attempt/{attemptid}/counters'.format(
             appid=application_id, jobid=job_id, taskid=task_id,

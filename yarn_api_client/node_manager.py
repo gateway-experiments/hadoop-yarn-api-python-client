@@ -8,6 +8,10 @@ class NodeManager(BaseYarnAPI):
     """
     The NodeManager REST API's allow the user to get status on the node and
     information about applications and containers running on that node.
+
+    :param str address: NodeManager HTTP address
+    :param int port: NodeManager HTTP port
+    :param int timeout: API connection timeout in seconds
     """
     def __init__(self, address=None, port=8042, timeout=30):
         self.address, self.port, self.timeout = address, port, timeout
@@ -16,6 +20,9 @@ class NodeManager(BaseYarnAPI):
         """
         The node information resource provides overall information about that
         particular node.
+
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/ws/v1/node/info'
         return self.request(path)
@@ -24,6 +31,13 @@ class NodeManager(BaseYarnAPI):
         """
         With the Applications API, you can obtain a collection of resources,
         each of which represents an application.
+
+        :param str state: application state
+        :param str user: user name
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        :raises yarn_api_client.errors.IllegalArgumentError: if `state`
+            incorrect
         """
         path = '/ws/v1/node/apps'
 
@@ -44,6 +58,10 @@ class NodeManager(BaseYarnAPI):
         """
         An application resource contains information about a particular
         application that was run or is running on this NodeManager.
+
+        :param str application_id: The application id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/ws/v1/node/apps/{appid}'.format(appid=application_id)
 
@@ -53,6 +71,9 @@ class NodeManager(BaseYarnAPI):
         """
         With the containers API, you can obtain a collection of resources,
         each of which represents a container.
+
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/ws/v1/node/containers'
 
@@ -62,6 +83,10 @@ class NodeManager(BaseYarnAPI):
         """
         A container resource contains information about a particular container
         that is running on this NodeManager.
+
+        :param str container_id: The container id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/ws/v1/node/containers/{containerid}'.format(
             containerid=container_id)

@@ -11,6 +11,13 @@ class HistoryServer(BaseYarnAPI):
     The history server REST API's allow the user to get status on finished
     applications. Currently it only supports MapReduce and provides
     information on finished jobs.
+
+    If `address` argument is `None` client will try to extract `address` and
+    `port` from Hadoop configuration files.
+
+    :param str address: HistoryServer HTTP address
+    :param int port: HistoryServer HTTP port
+    :param int timeout: API connection timeout in seconds
     """
     def __init__(self, address=None, port=19888, timeout=30):
         self.address, self.port, self.timeout = address, port, timeout
@@ -23,6 +30,9 @@ class HistoryServer(BaseYarnAPI):
         """
         The history server information resource provides overall information
         about the history server.
+
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/ws/v1/history/info'
 
@@ -34,6 +44,23 @@ class HistoryServer(BaseYarnAPI):
         """
         The jobs resource provides a list of the MapReduce jobs that have
         finished. It does not currently return a full list of parameters.
+
+        :param str user: user name
+        :param str state: the job state
+        :param str queue: queue name
+        :param str limit: total number of app objects to be returned
+        :param str started_time_begin: jobs with start time beginning with
+            this time, specified in ms since epoch
+        :param str started_time_end: jobs with start time ending with this
+            time, specified in ms since epoch
+        :param str finished_time_begin: jobs with finish time beginning with
+            this time, specified in ms since epoch
+        :param str finished_time_end: jobs with finish time ending with this
+            time, specified in ms since epoch
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        :raises yarn_api_client.errors.IllegalArgumentError: if `state`
+            incorrect
         """
         path = '/ws/v1/history/mapreduce/jobs'
 
@@ -60,6 +87,10 @@ class HistoryServer(BaseYarnAPI):
         """
         A Job resource contains information about a particular job identified
         by jobid.
+
+        :param str job_id: The job id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/ws/v1/history/mapreduce/jobs/{jobid}'.format(jobid=job_id)
 
@@ -79,6 +110,10 @@ class HistoryServer(BaseYarnAPI):
         """
         With the job counters API, you can object a collection of resources
         that represent al the counters for that job.
+
+        :param str job_id: The job id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/ws/v1/history/mapreduce/jobs/{jobid}/counters'.format(
             jobid=job_id)
@@ -89,6 +124,10 @@ class HistoryServer(BaseYarnAPI):
         """
         A job configuration resource contains information about the job
         configuration for this job.
+
+        :param str job_id: The job id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/ws/v1/history/mapreduce/jobs/{jobid}/conf'.format(jobid=job_id)
 
@@ -98,6 +137,12 @@ class HistoryServer(BaseYarnAPI):
         """
         With the tasks API, you can obtain a collection of resources that
         represent a task within a job.
+
+        :param str job_id: The job id
+        :param str type: type of task, valid values are m or r. m for map
+            task or r for reduce task
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/ws/v1/history/mapreduce/jobs/{jobid}/tasks'.format(
             jobid=job_id)
@@ -119,6 +164,11 @@ class HistoryServer(BaseYarnAPI):
         """
         A Task resource contains information about a particular task
         within a job.
+
+        :param str job_id: The job id
+        :param str task_id: The task id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/ws/v1/history/mapreduce/jobs/{jobid}/tasks/{taskid}'.format(
             jobid=job_id, taskid=task_id)
@@ -129,6 +179,11 @@ class HistoryServer(BaseYarnAPI):
         """
         With the task counters API, you can object a collection of resources
         that represent all the counters for that task.
+
+        :param str job_id: The job id
+        :param str task_id: The task id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/ws/v1/history/mapreduce/jobs/{jobid}/tasks/{taskid}/counters'.format(
             jobid=job_id, taskid=task_id)
@@ -139,6 +194,11 @@ class HistoryServer(BaseYarnAPI):
         """
         With the task attempts API, you can obtain a collection of resources
         that represent a task attempt within a job.
+
+        :param str job_id: The job id
+        :param str task_id: The task id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/ws/v1/history/mapreduce/jobs/{jobid}/tasks/{taskid}/attempts'.format(
             jobid=job_id, taskid=task_id)
@@ -149,6 +209,12 @@ class HistoryServer(BaseYarnAPI):
         """
         A Task Attempt resource contains information about a particular task
         attempt within a job.
+
+        :param str job_id: The job id
+        :param str task_id: The task id
+        :param str attempt_id: The attempt id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/ws/v1/history/mapreduce/jobs/{jobid}/tasks/{taskid}/attempt/{attemptid}'.format(
             jobid=job_id, taskid=task_id, attemptid=attempt_id)
@@ -159,6 +225,12 @@ class HistoryServer(BaseYarnAPI):
         """
         With the task attempt counters API, you can object a collection of
         resources that represent al the counters for that task attempt.
+
+        :param str job_id: The job id
+        :param str task_id: The task id
+        :param str attempt_id: The attempt id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/ws/v1/history/mapreduce/jobs/{jobid}/tasks/{taskid}/attempt/{attemptid}/counters'.format(
             jobid=job_id, taskid=task_id, attemptid=attempt_id)
