@@ -195,7 +195,9 @@ class ResourceManager(BaseYarnAPI):
             incorrect
         """
         path = '/ws/v1/cluster/nodes'
-        # TODO: validate state argument
+        if state is not None and state not in legal_states:
+            msg = 'Application State %s is illegal' % (state,)
+            raise IllegalArgumentError(msg)
 
         legal_healthy = ['true', 'false']
         if healthy is not None and healthy not in legal_healthy:
