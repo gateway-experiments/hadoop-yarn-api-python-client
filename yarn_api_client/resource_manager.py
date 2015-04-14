@@ -195,6 +195,7 @@ class ResourceManager(BaseYarnAPI):
             incorrect
         """
         path = '/ws/v1/cluster/nodes'
+        legal_states = set([s for s, _ in ApplicationState])
         if state is not None and state not in legal_states:
             msg = 'Application State %s is illegal' % (state,)
             raise IllegalArgumentError(msg)
