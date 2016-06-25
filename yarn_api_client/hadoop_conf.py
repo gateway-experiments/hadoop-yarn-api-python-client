@@ -23,7 +23,8 @@ def get_resource_manager(hadoop_conf_path, rm_id = None):
     else:
         rm_webapp_address = parse(os.path.join(hadoop_conf_path, 'yarn-site.xml'), prop_name)
     if rm_webapp_address is not None:
-        return rm_webapp_address.split(':')
+        [host, port] = rm_webapp_address.split(':')
+        return (host, port)
     else:
         return None
 
@@ -48,9 +49,11 @@ def get_resource_manager_host_port():
     rm_ids = get_rm_ids(hadoop_conf_path)
     if rm_ids is not None:
         for rm_id in rm_ids:
-            [rm_web_host, rm_web_port] = get_resource_manager(hadoop_conf_path, rm_id)
-            if check_is_active_rm(rm_web_host, rm_web_port):
-                return rm_web_host, rm_web_port
+            ret = get_resource_manager(hadoop_conf_path, rm_id)
+            if ret is not None:
+                (host, port) = ret
+                if check_is_active_rm(host, port):
+                    return host, port
         return None
     else:
         return get_resource_manager(hadoop_conf_path, None)
