@@ -75,6 +75,43 @@ class HadoopConfTestCase(TestCase):
         host_port = hadoop_conf.get_resource_manager_host_port()
         self.assertIsNone(host_port)
 
+    def test_get_rm_ids(self):
+        with patch('yarn_api_client.hadoop_conf.parse') as parse_mock:
+            parse_mock.return_value = 'rm1,rm2'
+            rm_list = hadoop_conf.get_rm_ids(hadoop_conf.CONF_DIR)
+            self.assertEqual(['rm1', 'rm2'], rm_list)
+            parse_mock.assert_called_with('/etc/hadoop/conf/yarn-site.xml', 'yarn.resourcemanager.ha.rm-ids')
+
+            parse_mock.reset_mock()
+            parse_mock.return_value = None
+
+            rm_list = hadoop_conf.get_rm_ids(hadoop_conf.CONF_DIR)
+            self.assertIsNone(rm_list)
+
+
+    def test_get_resource_manager(self):
+        with patch('yarn_api_client.hadoop_conf.parse') as parse_mock:
+            parse_mock.return_value = 'example.com:8022'
+
+            host_port = hadoop_conf.get_resource_manager(hadoop_conf.CONF_DIR, None)
+
+            self.assertEqual(('example.com', '8022'), host_port)
+            parse_mock.assert_called_with('/etc/hadoop/conf/yarn-site.xml',
+                    'yarn.resourcemanager.webapp.address')
+
+            host_port = hadoop_conf.get_resource_manager(hadoop_conf.CONF_DIR, 'rm1')
+
+            self.assertEqual(('example.com', '8022'), host_port)
+            parse_mock.assert_called_with('/etc/hadoop/conf/yarn-site.xml',
+                    'yarn.resourcemanager.webapp.address.rm1')
+
+            parse_mock.reset_mock()
+            parse_mock.return_value = None
+
+            host_port = hadoop_conf.get_resource_manager(hadoop_conf.CONF_DIR, 'rm1')
+            self.assertIsNone(host_port)
+
+    
     def test_get_jobhistory_host_port(self):
         with patch('yarn_api_client.hadoop_conf.parse') as parse_mock:
             parse_mock.return_value = 'example.com:8022'
