@@ -94,8 +94,8 @@ class HadoopConfTestCase(TestCase):
             self.assertIsNone(rm_list)
 
 
-    @mock.patch('httplib.HTTPConnection.request')
-    @mock.patch('httplib.HTTPConnection.getresponse')
+    @mock.patch('HTTPConnection.request')
+    @mock.patch('HTTPConnection.getresponse')
     def test_check_is_active_rm(self, http_getresponse_mock, http_conn_request_mock):
 
         class ResponseMock():
