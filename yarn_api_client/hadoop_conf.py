@@ -9,14 +9,14 @@ except ImportError:
 CONF_DIR = '/etc/hadoop/conf'
 
 
-def get_rm_ids(hadoop_conf_path):
+def _get_rm_ids(hadoop_conf_path):
     rm_ids = parse(os.path.join(hadoop_conf_path, 'yarn-site.xml'), 'yarn.resourcemanager.ha.rm-ids')
     if rm_ids is not None:
         rm_ids = rm_ids.split(',')
     return rm_ids
 
 
-def get_resource_manager(hadoop_conf_path, rm_id = None):
+def _get_resource_manager(hadoop_conf_path, rm_id = None):
     prop_name = 'yarn.resourcemanager.webapp.address'
     if rm_id is not None:
         rm_webapp_address = parse(os.path.join(hadoop_conf_path, 'yarn-site.xml'), '%s.%s' % (prop_name, rm_id))
@@ -29,7 +29,7 @@ def get_resource_manager(hadoop_conf_path, rm_id = None):
         return None
 
 
-def check_is_active_rm(rm_web_host, rm_web_port):
+def _check_is_active_rm(rm_web_host, rm_web_port):
     conn = HTTPConnection(rm_web_host, rm_web_port)
     try:
         conn.request('GET', '/cluster')
@@ -46,17 +46,17 @@ def check_is_active_rm(rm_web_host, rm_web_port):
 
 def get_resource_manager_host_port():
     hadoop_conf_path = CONF_DIR
-    rm_ids = get_rm_ids(hadoop_conf_path)
+    rm_ids = _get_rm_ids(hadoop_conf_path)
     if rm_ids is not None:
         for rm_id in rm_ids:
-            ret = get_resource_manager(hadoop_conf_path, rm_id)
+            ret = _get_resource_manager(hadoop_conf_path, rm_id)
             if ret is not None:
                 (host, port) = ret
-                if check_is_active_rm(host, port):
+                if _check_is_active_rm(host, port):
                     return host, port
         return None
     else:
-        return get_resource_manager(hadoop_conf_path, None)
+        return _get_resource_manager(hadoop_conf_path, None)
 
 
 def get_jobhistory_host_port():
