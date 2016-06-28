@@ -7,6 +7,11 @@ from tests import TestCase
 
 from yarn_api_client import hadoop_conf
 
+try:
+    from httplib import HTTPConnection, OK, NOT_FOUND
+except ImportError:
+    from http.client import HTTPConnection, OK, NOT_FOUND
+
 empty_config = '<configuration></configuration>'.encode('latin1')
 
 yarn_site_xml = """\
@@ -104,15 +109,14 @@ class HadoopConfTestCase(TestCase):
                 else:
                     return default_return
 
-        import httplib
         http_conn_request_mock.return_value = None
-        http_getresponse_mock.return_value = ResponseMock(httplib.OK, {})
+        http_getresponse_mock.return_value = ResponseMock(OK, {})
         self.assertTrue(hadoop_conf._check_is_active_rm('example2', '8022'))
         http_getresponse_mock.reset_mock()
-        http_getresponse_mock.return_value = ResponseMock(httplib.OK, {'Refresh':"testing"})
+        http_getresponse_mock.return_value = ResponseMock(OK, {'Refresh':"testing"})
         self.assertFalse(hadoop_conf._check_is_active_rm('example2', '8022'))
         http_getresponse_mock.reset_mock()
-        http_getresponse_mock.return_value = ResponseMock(httplib.NOT_FOUND, {'Refresh':"testing"})
+        http_getresponse_mock.return_value = ResponseMock(NOT_FOUND, {'Refresh':"testing"})
         self.assertFalse(hadoop_conf._check_is_active_rm('example2', '8022'))
         http_conn_request_mock.side_effect = Exception('error')
         http_conn_request_mock.reset_mock()
