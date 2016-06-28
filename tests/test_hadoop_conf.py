@@ -7,10 +7,18 @@ from tests import TestCase
 
 from yarn_api_client import hadoop_conf
 
+
+_http_request_method = ''
+_http_getresponse_method = ''
+
 try:
     from httplib import HTTPConnection, OK, NOT_FOUND
+    _http_request_method = 'httplib.HTTPConnection.request'
+    _http_getresponse_method = 'httplib.HTTPConnection.getresponse'
 except ImportError:
     from http.client import HTTPConnection, OK, NOT_FOUND
+    _http_request_method = 'http.client.HTTPConnection.request'
+    _http_getresponse_method = 'http.client.HTTPConnection.getresponse'
 
 empty_config = '<configuration></configuration>'.encode('latin1')
 
@@ -60,7 +68,6 @@ class HadoopConfTestCase(TestCase):
                 host_port = hadoop_conf.get_resource_manager_host_port()
                 self.assertIsNone(host_port)
 
-
     @mock.patch('yarn_api_client.hadoop_conf._get_rm_ids')
     @mock.patch('yarn_api_client.hadoop_conf.parse')
     @mock.patch('yarn_api_client.hadoop_conf._check_is_active_rm')
@@ -72,7 +79,7 @@ class HadoopConfTestCase(TestCase):
 
         self.assertEqual(('example.com', '8022'), host_port)
         parse_mock.assert_called_with('/etc/hadoop/conf/yarn-site.xml',
-                'yarn.resourcemanager.webapp.address.rm1')
+                                      'yarn.resourcemanager.webapp.address.rm1')
 
         parse_mock.reset_mock()
         parse_mock.return_value = None
@@ -93,18 +100,16 @@ class HadoopConfTestCase(TestCase):
             rm_list = hadoop_conf._get_rm_ids(hadoop_conf.CONF_DIR)
             self.assertIsNone(rm_list)
 
-
-    @mock.patch('HTTPConnection.request')
-    @mock.patch('HTTPConnection.getresponse')
+    @mock.patch(_http_request_method)
+    @mock.patch(_http_getresponse_method)
     def test_check_is_active_rm(self, http_getresponse_mock, http_conn_request_mock):
-
         class ResponseMock():
             def __init__(self, status, header_dict):
                 self.status = status
                 self.header_dict = header_dict
 
             def getheader(self, header_key, default_return):
-                if self.header_dict.has_key(header_key):
+                if header_key in self.header_dict:
                     return self.header_dict[header_key]
                 else:
                     return default_return
@@ -146,7 +151,6 @@ class HadoopConfTestCase(TestCase):
             host_port = hadoop_conf._get_resource_manager(hadoop_conf.CONF_DIR, 'rm1')
             self.assertIsNone(host_port)
 
-    
     def test_get_jobhistory_host_port(self):
         with patch('yarn_api_client.hadoop_conf.parse') as parse_mock:
             parse_mock.return_value = 'example.com:8022'
