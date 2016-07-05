@@ -216,7 +216,7 @@ class HistoryServer(BaseYarnAPI):
         :returns: API response object with JSON data
         :rtype: :py:class:`yarn_api_client.base.Response`
         """
-        path = '/ws/v1/history/mapreduce/jobs/{jobid}/tasks/{taskid}/attempt/{attemptid}'.format(
+        path = '/ws/v1/history/mapreduce/jobs/{jobid}/tasks/{taskid}/attempts/{attemptid}'.format(
             jobid=job_id, taskid=task_id, attemptid=attempt_id)
 
         return self.request(path)
@@ -232,7 +232,7 @@ class HistoryServer(BaseYarnAPI):
         :returns: API response object with JSON data
         :rtype: :py:class:`yarn_api_client.base.Response`
         """
-        path = '/ws/v1/history/mapreduce/jobs/{jobid}/tasks/{taskid}/attempt/{attemptid}/counters'.format(
+        path = '/ws/v1/history/mapreduce/jobs/{jobid}/tasks/{taskid}/attempts/{attemptid}/counters'.format(
             jobid=job_id, taskid=task_id, attemptid=attempt_id)
 
         return self.request(path)

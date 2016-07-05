@@ -77,8 +77,8 @@ class HistoryServerTestCase(TestCase):
 
     def test_task_attempt(self, request_mock):
         self.hs.task_attempt('job_2', 'task_3', 'attempt_4')
-        request_mock.assert_called_with('/ws/v1/history/mapreduce/jobs/job_2/tasks/task_3/attempt/attempt_4')
+        request_mock.assert_called_with('/ws/v1/history/mapreduce/jobs/job_2/tasks/task_3/attempts/attempt_4')
 
     def test_task_attempt_counters(self, request_mock):
         self.hs.task_attempt_counters('job_2', 'task_3', 'attempt_4')
-        request_mock.assert_called_with('/ws/v1/history/mapreduce/jobs/job_2/tasks/task_3/attempt/attempt_4/counters')
+        request_mock.assert_called_with('/ws/v1/history/mapreduce/jobs/job_2/tasks/task_3/attempts/attempt_4/counters')
