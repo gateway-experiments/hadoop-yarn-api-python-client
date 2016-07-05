@@ -38,7 +38,8 @@ class BaseYarnAPI(object):
         if response.status == OK:
             return self.response_class(response)
         else:
-            msg = 'Response finished with status: %s' % response.status
+            explanation = response.read()
+            msg = 'Response finished with status: %s. Details: %s' % (response.status, explanation)
             raise APIError(msg)
 
     def construct_parameters(self, arguments):
