@@ -30,9 +30,10 @@ class BaseYarnAPI(object):
             path = api_path
 
         self.logger.info('Request http://%s:%s%s', self.address, self.port, path)
-        self.http_conn.request('GET', path)
-
-        response = self.http_conn.getresponse()
+        
+        http_conn = self.http_conn
+        http_conn.request('GET', path)
+        response = http_conn.getresponse()
 
         if response.status == OK:
             return self.response_class(response)
@@ -44,19 +45,13 @@ class BaseYarnAPI(object):
         params = dict((key, value) for key, value in arguments if value is not None)
         return params
 
-
-    __http_conn = None
     @property
     def http_conn(self):
-        if self.__http_conn is None:
-            if self.address is None:
-                raise ConfigurationError('API address is not set')
-            elif self.port is None:
-                raise ConfigurationError('API port is not set')
-            self.__http_conn = HTTPConnection(self.address, self.port,
-                                              timeout=self.timeout)
-
-        return self.__http_conn
+        if self.address is None:
+            raise ConfigurationError('API address is not set')
+        elif self.port is None:
+            raise ConfigurationError('API port is not set')
+        return HTTPConnection(self.address, self.port, timeout=self.timeout)
 
     __logger = None
     @property

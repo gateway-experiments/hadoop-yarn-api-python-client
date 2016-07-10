@@ -12,13 +12,6 @@ from yarn_api_client.errors import APIError, ConfigurationError
 
 
 class BaseYarnAPITestCase(TestCase):
-    def test_http_property_cache(self):
-        client = self.get_client()
-        http_conn1 = client.http_conn
-        http_conn2 = client.http_conn
-
-        self.assertIs(http_conn1, http_conn2)
-
     def test_request(self):
         client = self.get_client()
         with patch('yarn_api_client.base.HTTPConnection') as http_conn_mock:
