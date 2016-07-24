@@ -12,11 +12,13 @@ except ImportError:
     from urllib.parse import urlencode
 
 from .errors import APIError, ConfigurationError
+import codecs
 
 
 class Response(object):
     def __init__(self, http_response):
-        self.data = json.load(http_response)
+        reader = codecs.getreader("utf-8")
+        self.data = json.load(reader(http_response))
 
 
 class BaseYarnAPI(object):
