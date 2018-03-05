@@ -8,11 +8,11 @@ Python client for Hadoop® YARN API
     :target: https://coveralls.io/r/toidi/hadoop-yarn-api-python-client
     :alt: Test coverage
 
-.. image:: https://pypip.in/version/yarn-api-client/badge.png
+.. image:: https://img.shields.io/pypi/v/yarn-api-client.svg
     :target: https://pypi.python.org/pypi/yarn-api-client/
     :alt: Latest Version
 
-.. image:: https://pypip.in/download/yarn-api-client/badge.png
+.. image:: https://img.shields.io/pypi/dm/yarn-api-client.svg
     :target: https://pypi.python.org/pypi//yarn-api-client/
     :alt: Downloads
 
