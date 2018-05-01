@@ -4,7 +4,7 @@ try:
 except ImportError:
     from http.client import OK
 
-from mock import patch
+from mock import patch, MagicMock
 from tests import TestCase
 
 from yarn_api_client import base
@@ -17,6 +17,9 @@ class BaseYarnAPITestCase(TestCase):
         with patch('yarn_api_client.base.HTTPConnection') as http_conn_mock:
             with patch('yarn_api_client.base.json'):
                 http_conn_mock().getresponse().status = OK
+                headers_mock = MagicMock()
+                headers_mock.get_content_charset = MagicMock(return_value="utf-8")
+                http_conn_mock().getresponse().headers = headers_mock
 
                 client.request('/ololo', foo='bar')
 

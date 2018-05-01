@@ -16,7 +16,7 @@ from .errors import APIError, ConfigurationError
 
 class Response(object):
     def __init__(self, http_response):
-        self.data = json.load(http_response)
+        self.data = json.loads(http_response.read().decode(http_response.headers.get_content_charset('utf-8')))
 
 
 class BaseYarnAPI(object):
