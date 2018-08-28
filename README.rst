@@ -64,5 +64,12 @@ Programmatic interface
 
    from yarn_api_client import ApplicationMaster, HistoryServer, NodeManager, ResourceManager
 
+Changelog
+=========
+
+0.2.5 - Fixed History REST API
+
+0.2.4 - Added compatibility with HA enabled Resource Manager
+
 .. _python-client-for-hadoop-yarn-api.readthedocs.org: http://python-client-for-hadoop-yarn-api.readthedocs.org/en/latest/
 .. _hadoop.apache.org: http://hadoop.apache.org/docs/stable/hadoop-yarn/hadoop-yarn-site/WebServicesIntro.html
