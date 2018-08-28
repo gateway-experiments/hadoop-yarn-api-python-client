@@ -1,13 +1,22 @@
+sudo: false
+
 language: python
+
+matrix:
+  include:
+    - python: 3.6
+      env: TOXENV=py36
+    - python: 3.5
+      env: TOXENV=py35
+    - python: 2.7
+      env: TOXENV=py27
+
+
 install:
   - pip install tox coveralls
-# command to run tests
+
 script:
   tox
-env:
-  - TOXENV=py26
-  - TOXENV=py27
-  - TOXENV=py34
-  - TOXENV=py35
+
 after_success:
   coveralls
