@@ -12,17 +12,9 @@ Python client for Hadoop® YARN API
     :target: https://pypi.python.org/pypi/yarn-api-client/
     :alt: Latest Version
 
-.. image:: https://img.shields.io/pypi/dm/yarn-api-client.svg
-    :target: https://pypi.python.org/pypi//yarn-api-client/
-    :alt: Downloads
-
 .. image:: https://travis-ci.org/toidi/hadoop-yarn-api-python-client.svg?branch=master
     :target: https://travis-ci.org/toidi/hadoop-yarn-api-python-client
     :alt: Travis CI build status
-
-.. image:: https://caniusepython3.com/project/yarn-api-client.svg
-    :target: https://caniusepython3.com/project/yarn-api-client
-    :alt: Python 3 port
 
 Package documentation: python-client-for-hadoop-yarn-api.readthedocs.org_
 
