@@ -2,6 +2,27 @@
 *~
 \#*\#
 
+# Mac
+.DS_Store
+
+# Eclipse
+.classpath
+.project
+.settings/
+target/
+
+# Intellij
+.idea/
+.idea_modules/
+*.iml
+*.iws
+*.class
+*.log
+
+# Others
+.checkstyle
+.fbExcludeFilterFile
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -55,4 +76,3 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
-
