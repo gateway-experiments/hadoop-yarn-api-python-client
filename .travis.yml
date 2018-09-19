@@ -13,7 +13,11 @@ matrix:
 
 
 install:
-  - pip install tox coveralls
+  - pip install --upgrade setuptools pip
+  - pip install --upgrade requests requests_mock requests_kerberos tox coveralls
+  - python setup.py bdist_wheel
+  - pip install dist/*.whl
+  - pip freeze
 
 script:
   tox

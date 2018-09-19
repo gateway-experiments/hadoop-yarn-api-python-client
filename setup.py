@@ -19,17 +19,17 @@ def find_version(*file_paths):
         return version_match.group(1)
     raise RuntimeError("Unable to find version string.")
 
-
-install_requires = []
-
 setup(
     name = 'yarn-api-client',
     version = find_version('yarn_api_client', '__init__.py'),
     description='Python client for Hadoop® YARN API',
     long_description=read('README.rst'),
-    packages = find_packages(exclude=['tests']),
+    packages = find_packages(exclude=['tests','itests']),
 
-    install_requires = install_requires,
+    install_requires = [
+        'requests>=2.7,<3.0',
+        'requests-kerberos==0.12.0',
+    ],
     entry_points = {
         'console_scripts': [
             'yarn_client = yarn_api_client.main:main',

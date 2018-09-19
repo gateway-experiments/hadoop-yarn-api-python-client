@@ -18,9 +18,10 @@ class ApplicationMaster(BaseYarnAPI):
     :param str address: Proxy HTTP address
     :param int port: Proxy HTTP port
     :param int timeout: API connection timeout in seconds
+    :param boolean kerberos_enabled: Flag identifying is Kerberos Security has been enabled for YARN
     """
-    def __init__(self, address=None, port=8088, timeout=30):
-        self.address, self.port, self.timeout = address, port, timeout
+    def __init__(self, address=None, port=8088, timeout=30, kerberos_enabled=False):
+        self.address, self.port, self.timeout, self.kerberos_enabled = address, port, timeout, kerberos_enabled
         if address is None:
             self.logger.debug('Get configuration from hadoop conf dir')
             address, port = get_webproxy_host_port()
