@@ -28,7 +28,7 @@ setup(
 
     install_requires = [
         'requests>=2.7,<3.0',
-        'requests-kerberos==0.12.0',
+        'requests-kerberos',
     ],
     entry_points = {
         'console_scripts': [
