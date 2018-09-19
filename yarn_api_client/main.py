@@ -256,7 +256,7 @@ def main():
         method_args = [getattr(opts, arg) for arg in opts.method_args]
     else:
         method_args = []
-    # Construce key arguments for method
+    # Construct key arguments for method
     if 'method_kwargs' in opts:
         method_kwargs = dict((key, getattr(opts, key)) for key in opts.method_kwargs)
     else:

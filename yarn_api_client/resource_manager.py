@@ -19,9 +19,10 @@ class ResourceManager(BaseYarnAPI):
     :param str address: ResourceManager HTTP address
     :param int port: ResourceManager HTTP port
     :param int timeout: API connection timeout in seconds
+    :param boolean kerberos_enabled: Flag identifying is Kerberos Security has been enabled for YARN
     """
-    def __init__(self, address=None, port=8088, timeout=30):
-        self.address, self.port, self.timeout = address, port, timeout
+    def __init__(self, address=None, port=8088, timeout=30, kerberos_enabled=False):
+        self.address, self.port, self.timeout, self.kerberos_enabled = address, port, timeout, kerberos_enabled
         if address is None:
             self.logger.debug('Get configuration from hadoop conf dir')
             address, port = get_resource_manager_host_port()
@@ -132,7 +133,7 @@ class ResourceManager(BaseYarnAPI):
             comma-separated list. If states is not provided, the API will
             enumerate all application states and return the counts of them.
         :param list application_type_list: types of the applications,
-            specified as a comma-separated list. If applicationTypes is not
+            specified as a comma-separated list. If application_types is not
             provided, the API will count the applications of any application
             type. In this case, the response shows * to indicate any
             application type. Note that we only support at most one
@@ -146,13 +147,13 @@ class ResourceManager(BaseYarnAPI):
         # TODO: validate state argument
         states = ','.join(state_list) if state_list is not None else None
         if application_type_list is not None:
-            applicationTypes = ','.join(application_type_list)
+            application_types = ','.join(application_type_list)
         else:
-            applicationTypes = None
+            application_types = None
 
         loc_args = (
             ('states', states),
-            ('applicationTypes', applicationTypes))
+            ('applicationTypes', application_types))
         params = self.construct_parameters(loc_args)
 
         return self.request(path, **params)
@@ -183,6 +184,36 @@ class ResourceManager(BaseYarnAPI):
             appid=application_id)
 
         return self.request(path)
+
+    def cluster_application_state(self, application_id):
+        """
+        With the application state API, you can obtain the current
+        state of an application.
+
+        :param str application_id: The application id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/apps/{appid}/state'.format(
+            appid=application_id)
+
+        return self.request(path)
+
+    def cluster_application_kill(self, application_id):
+        """
+        With the application kill API, you can kill an application
+        that is not in FINISHED or FAILED state.
+
+        :param str application_id: The application id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+
+        data = '{"state": "KILLED"}'
+        path = '/ws/v1/cluster/apps/{appid}/state'.format(
+            appid=application_id)
+
+        return self.put(path, data)
 
     def cluster_nodes(self, state=None, healthy=None):
         """
