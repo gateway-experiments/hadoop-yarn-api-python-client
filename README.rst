@@ -76,6 +76,9 @@ Programmatic interface
 Changelog
 =========
 
+0.3.1 Release
+   - Fix cluster_application_kill API
+
 0.3.0 Release
     - Add support for YARN endpoints protected by Kerberos/SPNEGO
     - Moved to `requests` package for REST API invocation
