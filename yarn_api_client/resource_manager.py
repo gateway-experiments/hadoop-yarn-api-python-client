@@ -185,6 +185,36 @@ class ResourceManager(BaseYarnAPI):
 
         return self.request(path)
 
+    def cluster_application_attempt_info(self, application_id, attempt_id):
+        """
+        With the application attempts API, you can obtain an extended info about
+        an application attempt.
+
+        :param str application_id: The application id
+        :param str attempt_id: The attempt id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/apps/{appid}/appattempts/{attemptid}'.format(
+            appid=application_id, attemptid=attempt_id)
+
+        return self.request(path)
+
+    def cluster_application_attempt_containers(self, application_id, attempt_id):
+        """
+        With the application attempts API, you can obtain an information
+        about container related to an application attempt.
+
+        :param str application_id: The application id
+        :param str attempt_id: The attempt id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/apps/{appid}/appattempts/{attemptid}/containers'.format(
+            appid=application_id, attemptid=attempt_id)
+
+        return self.request(path)
+
     def cluster_application_state(self, application_id):
         """
         With the application state API, you can obtain the current
