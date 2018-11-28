@@ -49,6 +49,18 @@ From source code
    python setup.py install
    popd
 
+
+Enabling support for Kerberos/SPNEGO Security
+
+To avoid deployment issues on a non Kerberized environment, the `requests_kerberos`
+dependency is optional and needs to be explicit installed in order to enable access
+to YARN console protected by Kerberos/SPNEGO.
+
+::
+
+   pip install requests_kerberos
+
+
 -----
 Usage
 -----

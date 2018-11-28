@@ -5,7 +5,6 @@ import json
 import logging
 import requests
 
-from requests_kerberos import HTTPKerberosAuth
 from .errors import APIError, ConfigurationError
 
 
@@ -34,6 +33,7 @@ class BaseYarnAPI(object):
 
         response = None
         if self.kerberos_enabled:
+            from requests_kerberos import HTTPKerberosAuth
             response = requests.get(api_endpoint, params, auth=HTTPKerberosAuth())
         else:
             response = requests.get(api_endpoint, params)
@@ -53,6 +53,7 @@ class BaseYarnAPI(object):
 
         response = None
         if self.kerberos_enabled:
+            from requests_kerberos import HTTPKerberosAuth
             response = requests.put(api_endpoint, data=data, auth=HTTPKerberosAuth())
         else:
             response = requests.put(api_endpoint, data=data)
