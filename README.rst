@@ -88,6 +88,9 @@ Programmatic interface
 Changelog
 =========
 
+0.3.2 Release
+   - Make Kerberos/SPNEGO dependency optional
+
 0.3.1 Release
    - Fix cluster_application_kill API
 
