@@ -54,9 +54,9 @@ class BaseYarnAPI(object):
         response = None
         if self.kerberos_enabled:
             from requests_kerberos import HTTPKerberosAuth
-            response = requests.put(api_endpoint, data=data, auth=HTTPKerberosAuth())
+            response = requests.put(api_endpoint, data=data, auth=HTTPKerberosAuth(), headers={"Content-Type":"application/json"})
         else:
-            response = requests.put(api_endpoint, data=data)
+            response = requests.put(api_endpoint, data=data, headers={"Content-Type":"application/json"})
 
         if response.status_code == requests.codes.ok:
             return self.response_class(response)
