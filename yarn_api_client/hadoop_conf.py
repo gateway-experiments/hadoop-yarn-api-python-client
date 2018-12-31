@@ -6,7 +6,7 @@ try:
 except ImportError:
     from http.client import HTTPConnection, OK
 
-CONF_DIR = '/etc/hadoop/conf'
+CONF_DIR = os.getenv('HADOOP_CONF_DIR', '/etc/hadoop/conf')
 
 
 def _get_rm_ids(hadoop_conf_path):
