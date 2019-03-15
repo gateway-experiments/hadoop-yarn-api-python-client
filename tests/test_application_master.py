@@ -61,4 +61,5 @@ class AppMasterTestCase(TestCase):
 
     def test_task_attempt_counters(self, request_mock):
         self.app.task_attempt_counters('app_1', 'job_2', 'task_3', 'attempt_4')
-        request_mock.assert_called_with('/proxy/app_1/ws/v1/mapreduce/jobs/job_2/tasks/task_3/attempt/attempt_4/counters')
+        request_mock.assert_called_with(
+            '/proxy/app_1/ws/v1/mapreduce/jobs/job_2/tasks/task_3/attempt/attempt_4/counters')

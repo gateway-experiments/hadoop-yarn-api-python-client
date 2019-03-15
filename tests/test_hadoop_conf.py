@@ -12,11 +12,11 @@ _http_request_method = ''
 _http_getresponse_method = ''
 
 try:
-    from httplib import HTTPConnection, OK, NOT_FOUND
+    from httplib import HTTPConnection, OK, NOT_FOUND # NOQA
     _http_request_method = 'httplib.HTTPConnection.request'
     _http_getresponse_method = 'httplib.HTTPConnection.getresponse'
 except ImportError:
-    from http.client import HTTPConnection, OK, NOT_FOUND
+    from http.client import HTTPConnection, OK, NOT_FOUND # NOQA
     _http_request_method = 'http.client.HTTPConnection.request'
     _http_getresponse_method = 'http.client.HTTPConnection.getresponse'
 
@@ -118,10 +118,10 @@ class HadoopConfTestCase(TestCase):
         http_getresponse_mock.return_value = ResponseMock(OK, {})
         self.assertTrue(hadoop_conf._check_is_active_rm('example2', '8022'))
         http_getresponse_mock.reset_mock()
-        http_getresponse_mock.return_value = ResponseMock(OK, {'Refresh':"testing"})
+        http_getresponse_mock.return_value = ResponseMock(OK, {'Refresh': "testing"})
         self.assertFalse(hadoop_conf._check_is_active_rm('example2', '8022'))
         http_getresponse_mock.reset_mock()
-        http_getresponse_mock.return_value = ResponseMock(NOT_FOUND, {'Refresh':"testing"})
+        http_getresponse_mock.return_value = ResponseMock(NOT_FOUND, {'Refresh': "testing"})
         self.assertFalse(hadoop_conf._check_is_active_rm('example2', '8022'))
         http_conn_request_mock.side_effect = Exception('error')
         http_conn_request_mock.reset_mock()
@@ -136,14 +136,12 @@ class HadoopConfTestCase(TestCase):
             host_port = hadoop_conf._get_resource_manager(hadoop_conf.CONF_DIR, None)
 
             self.assertEqual(('example.com', '8022'), host_port)
-            parse_mock.assert_called_with('/etc/hadoop/conf/yarn-site.xml',
-                    'yarn.resourcemanager.webapp.address')
+            parse_mock.assert_called_with('/etc/hadoop/conf/yarn-site.xml', 'yarn.resourcemanager.webapp.address')
 
             host_port = hadoop_conf._get_resource_manager(hadoop_conf.CONF_DIR, 'rm1')
 
             self.assertEqual(('example.com', '8022'), host_port)
-            parse_mock.assert_called_with('/etc/hadoop/conf/yarn-site.xml',
-                    'yarn.resourcemanager.webapp.address.rm1')
+            parse_mock.assert_called_with('/etc/hadoop/conf/yarn-site.xml', 'yarn.resourcemanager.webapp.address.rm1')
 
             parse_mock.reset_mock()
             parse_mock.return_value = None
