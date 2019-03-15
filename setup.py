@@ -40,7 +40,7 @@ setup(
         ],
     },
 
-    tests_require = ['mock'],
+    tests_require = ['mock', 'flake8'],
     test_suite = 'tests',
 
     author = 'Iskandarov Eduard',

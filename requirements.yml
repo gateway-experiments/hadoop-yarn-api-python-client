@@ -1,0 +1,21 @@
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - pip
+  - requests>=2.7,<3.0
+
+  # Test Requirements
+  - mock
+  - nose
+  - tox
+  - pip:
+      - requests_mock
+
+  # Code Style
+  - flake8
+
+  # Documentation Requirements
+  - recommonmark
+  - sphinx=1.8.3
+  - sphinx_rtd_theme
