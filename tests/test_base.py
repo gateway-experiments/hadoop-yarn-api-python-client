@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 try:
-    from httplib import OK
+    from httplib import OK # NOQA
 except ImportError:
-    from http.client import OK
+    from http.client import OK # NOQA
 
 import json
-import requests
 import requests_mock
 
 from tests import TestCase
@@ -17,7 +16,7 @@ class BaseYarnAPITestCase(TestCase):
     @staticmethod
     def success_response():
         return {
-            'status':'success'
+            'status': 'success'
         }
 
     def test_valid_request(self):
@@ -29,7 +28,6 @@ class BaseYarnAPITestCase(TestCase):
 
             assert requests_get_mock.called
             self.assertIn(response.data['status'], 'success')
-
 
     def test_valid_request_with_parameters(self):
         with requests_mock.mock() as requests_get_mock:
