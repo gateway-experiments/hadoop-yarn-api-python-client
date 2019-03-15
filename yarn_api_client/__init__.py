@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-__version__ = '0.3.2'
-__all__ = ['ApplicationMaster', 'HistoryServer', 'NodeManager',
-           'ResourceManager']
+__version__ = '0.3.3.dev0'
+__all__ = ['ApplicationMaster', 'HistoryServer', 'NodeManager','ResourceManager']
 
 from .application_master import ApplicationMaster
 from .history_server import HistoryServer
