@@ -88,6 +88,10 @@ Programmatic interface
 Changelog
 =========
 
+0.3.3 Release
+   - Properly set Content-Type in PUT requests
+   - Check for HADOOP_CONF_DIR env variable
+
 0.3.2 Release
    - Make Kerberos/SPNEGO dependency optional
 
