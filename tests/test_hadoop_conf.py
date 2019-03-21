@@ -70,7 +70,7 @@ class HadoopConfTestCase(TestCase):
 
     @mock.patch('yarn_api_client.hadoop_conf._get_rm_ids')
     @mock.patch('yarn_api_client.hadoop_conf.parse')
-    @mock.patch('yarn_api_client.hadoop_conf._check_is_active_rm')
+    @mock.patch('yarn_api_client.hadoop_conf.check_is_active_rm')
     def test_get_resource_host_port_with_ha(self, check_is_active_rm_mock, parse_mock, get_rm_ids_mock):
         get_rm_ids_mock.return_value = ['rm1', 'rm2']
         parse_mock.return_value = 'example.com:8022'
@@ -116,17 +116,17 @@ class HadoopConfTestCase(TestCase):
 
         http_conn_request_mock.return_value = None
         http_getresponse_mock.return_value = ResponseMock(OK, {})
-        self.assertTrue(hadoop_conf._check_is_active_rm('example2', '8022'))
+        self.assertTrue(hadoop_conf.check_is_active_rm('example2', '8022'))
         http_getresponse_mock.reset_mock()
         http_getresponse_mock.return_value = ResponseMock(OK, {'Refresh': "testing"})
-        self.assertFalse(hadoop_conf._check_is_active_rm('example2', '8022'))
+        self.assertFalse(hadoop_conf.check_is_active_rm('example2', '8022'))
         http_getresponse_mock.reset_mock()
         http_getresponse_mock.return_value = ResponseMock(NOT_FOUND, {'Refresh': "testing"})
-        self.assertFalse(hadoop_conf._check_is_active_rm('example2', '8022'))
+        self.assertFalse(hadoop_conf.check_is_active_rm('example2', '8022'))
         http_conn_request_mock.side_effect = Exception('error')
         http_conn_request_mock.reset_mock()
         http_conn_request_mock.return_value = None
-        self.assertFalse(hadoop_conf._check_is_active_rm('example2', '8022'))
+        self.assertFalse(hadoop_conf.check_is_active_rm('example2', '8022'))
         pass
 
     def test_get_resource_manager(self):
