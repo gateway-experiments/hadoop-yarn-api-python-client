@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from .base import BaseYarnAPI
 from .constants import YarnApplicationState, FinalApplicationStatus
 from .errors import IllegalArgumentError
-from .hadoop_conf import get_resource_manager_host_port
+from .hadoop_conf import get_resource_manager_host_port, check_is_active_rm, CONF_DIR
 
 
 class ResourceManager(BaseYarnAPI):
@@ -14,19 +14,37 @@ class ResourceManager(BaseYarnAPI):
     and information about applications on the cluster.
 
     If `address` argument is `None` client will try to extract `address` and
-    `port` from Hadoop configuration files.
+    `port` from Hadoop configuration files.  If both `address` and `alt_address`
+    are provided, the address corresponding to the ACTIVE HA Resource Manager will
+    be used.
 
     :param str address: ResourceManager HTTP address
     :param int port: ResourceManager HTTP port
+    :param str alt_address: Alternate ResourceManager HTTP address for HA configurations
+    :param int alt_port: Alternate ResourceManager HTTP port for HA configurations
     :param int timeout: API connection timeout in seconds
     :param boolean kerberos_enabled: Flag identifying is Kerberos Security has been enabled for YARN
     """
-    def __init__(self, address=None, port=8088, timeout=30, kerberos_enabled=False):
+    def __init__(self, address=None, port=8088, alt_address=None, alt_port=8088, timeout=30, kerberos_enabled=False):
         if address is None:
-            self.logger.debug('Get configuration from hadoop conf dir')
+            self.logger.debug('Get configuration from hadoop conf dir: {conf_dir}'.format(conf_dir=CONF_DIR))
             address, port = get_resource_manager_host_port()
+        else:
+            if alt_address:  # Determine active RM
+                if not check_is_active_rm(address, port):
+                    # Default is not active, check alternate
+                    if check_is_active_rm(alt_address, alt_port):
+                        address, port = alt_address, alt_port
 
         super(ResourceManager, self).__init__(address, port, timeout, kerberos_enabled)
+
+    def get_active_host_port(self):
+        """
+        The active address, port tuple to which this instance is associated.
+
+        :return: Tuple (str, int) corresponding to the active address and port
+        """
+        return self.address, self.port
 
     def cluster_information(self):
         """
