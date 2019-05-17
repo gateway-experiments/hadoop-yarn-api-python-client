@@ -64,11 +64,11 @@ class ResourceManagerTestCase(TestCase):
 
     def test_cluster_nodes(self, request_mock):
         self.rm.cluster_nodes()
-        request_mock.assert_called_with('/ws/v1/cluster/nodes')
+        request_mock.assert_called_with('/ws/v1/cluster/nodes', params={})
 
         self.rm.cluster_nodes(state='NEW', healthy='true')
         request_mock.assert_called_with('/ws/v1/cluster/nodes',
-                                        state='NEW', healthy='true')
+                                        params={"state": 'NEW', "healthy": 'true'})
 
         with self.assertRaises(IllegalArgumentError):
             self.rm.cluster_nodes(state='NEW', healthy='ololo')
@@ -76,3 +76,28 @@ class ResourceManagerTestCase(TestCase):
     def test_cluster_node(self, request_mock):
         self.rm.cluster_node('node_1')
         request_mock.assert_called_with('/ws/v1/cluster/nodes/node_1')
+
+    # TODO
+    # def test_cluster_submit_application(self, request_mock):
+    #     self.rm.cluster_submit_application()
+    #     request_mock.assert_called_with('/ws/v1/cluster/apps')
+
+    def test_cluster_new_application(self, request_mock):
+        self.rm.cluster_new_application()
+        request_mock.assert_called_with('/ws/v1/cluster/apps/new-application', 'POST')
+
+    def test_cluster_get_application_queue(self, request_mock):
+        self.rm.cluster_get_application_queue('app_1')
+        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/queue')
+
+    def test_cluster_change_application_queue(self, request_mock):
+        self.rm.cluster_change_application_queue('app_1', 'queue_1')
+        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/queue', 'PUT', data={"queue": 'queue_1'})
+
+    def test_cluster_get_application_priority(self, request_mock):
+        self.rm.cluster_get_application_priority('app_1')
+        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/priority')
+
+    def test_cluster_change_application_priority(self, request_mock):
+        self.rm.cluster_change_application_priority('app_1', 'priority_1')
+        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/priority', 'PUT', data={"priority": 'priority_1'})
