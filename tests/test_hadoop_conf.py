@@ -165,6 +165,24 @@ class HadoopConfTestCase(TestCase):
             host_port = hadoop_conf.get_jobhistory_host_port()
             self.assertIsNone(host_port)
 
+
+    def test_get_nodemanager_host_port(self):
+        with patch('yarn_api_client.hadoop_conf.parse') as parse_mock:
+            parse_mock.return_value = 'example.com:8022'
+
+            host_port = hadoop_conf.get_nodemanager_host_port()
+
+            self.assertEqual(('example.com', '8022'), host_port)
+            parse_mock.assert_called_with('/etc/hadoop/conf/yarn-site.xml',
+                                          'yarn.nodemanager.webapp.address')
+
+            parse_mock.reset_mock()
+            parse_mock.return_value = None
+
+            host_port = hadoop_conf.get_nodemanager_host_port()
+            self.assertIsNone(host_port)
+
+
     def test_get_webproxy_host_port(self):
         with patch('yarn_api_client.hadoop_conf.parse') as parse_mock:
             parse_mock.return_value = 'example.com:8022'

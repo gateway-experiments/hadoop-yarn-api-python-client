@@ -63,9 +63,9 @@ def populate_resource_manager_arguments(subparsers):
     cas_parser.add_argument('--finished-time-end')
     cas_parser.set_defaults(method='cluster_applications')
     cas_parser.set_defaults(method_kwargs=[
-            'state', 'user', 'queue', 'limit',
-            'started_time_begin', 'started_time_end', 'finished_time_begin',
-            'finished_time_end', 'final_status'])
+        'state', 'user', 'queue', 'limit',
+        'started_time_begin', 'started_time_end', 'finished_time_begin',
+        'finished_time_end', 'final_status'])
 
     ca_parser = rm_subparsers.add_parser(
         'app', help='Cluster Application API')
@@ -165,9 +165,9 @@ def populate_history_server_arguments(subparsers):
     hjs_parser.add_argument('--finished-time-end')
     hjs_parser.set_defaults(method='jobs')
     hjs_parser.set_defaults(method_kwargs=[
-            'state', 'user', 'queue', 'limit',
-            'started_time_begin', 'started_time_end', 'finished_time_begin',
-            'finished_time_end'])
+        'state', 'user', 'queue', 'limit',
+        'started_time_begin', 'started_time_end', 'finished_time_begin',
+        'finished_time_end'])
 
     hj_parser = hs_subparsers.add_parser('job', help='Job API')
     hj_parser.add_argument('job_id')

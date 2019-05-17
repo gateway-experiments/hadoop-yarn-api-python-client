@@ -22,11 +22,11 @@ class ResourceManager(BaseYarnAPI):
     :param boolean kerberos_enabled: Flag identifying is Kerberos Security has been enabled for YARN
     """
     def __init__(self, address=None, port=8088, timeout=30, kerberos_enabled=False):
-        self.address, self.port, self.timeout, self.kerberos_enabled = address, port, timeout, kerberos_enabled
         if address is None:
             self.logger.debug('Get configuration from hadoop conf dir')
             address, port = get_resource_manager_host_port()
-            self.address, self.port = address, port
+
+        super(ResourceManager, self).__init__(address, port, timeout, kerberos_enabled)
 
     def cluster_information(self):
         """
@@ -94,12 +94,12 @@ class ResourceManager(BaseYarnAPI):
         """
         path = '/ws/v1/cluster/apps'
 
-        legal_states = set([s for s, _ in YarnApplicationState])
+        legal_states = {s for s, _ in YarnApplicationState}
         if state is not None and state not in legal_states:
             msg = 'Yarn Application State %s is illegal' % (state,)
             raise IllegalArgumentError(msg)
 
-        legal_final_statuses = set([s for s, _ in FinalApplicationStatus])
+        legal_final_statuses = {s for s, _ in FinalApplicationStatus}
         if final_status is not None and final_status not in legal_final_statuses:
             msg = 'Final Application Status %s is illegal' % (final_status,)
             raise IllegalArgumentError(msg)
@@ -243,7 +243,7 @@ class ResourceManager(BaseYarnAPI):
         path = '/ws/v1/cluster/apps/{appid}/state'.format(
             appid=application_id)
 
-        return self.update(path, data)
+        return self.request(path, 'PUT', data=data)
 
     def cluster_nodes(self, state=None, healthy=None):
         """
