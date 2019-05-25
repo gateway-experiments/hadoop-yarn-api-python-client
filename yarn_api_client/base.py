@@ -44,7 +44,7 @@ class BaseYarnAPI(object):
         else:
             response = requests.request(method=method, url=api_endpoint, headers=headers, **kwargs)
 
-        if response.status_code == requests.codes.ok:
+        if response.status_code in (200, 202):
             return self.response_class(response)
         else:
             msg = 'Response finished with status: %s. Details: %s' % (response.status_code, response.text)
