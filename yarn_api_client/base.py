@@ -16,8 +16,13 @@ class BaseYarnAPI(object):
     __logger = None
     response_class = Response
 
-    def __init__(self, address=None, port=None, timeout=None, kerberos_enabled=None):
-        self.address, self.port, self.timeout, self.kerberos_enabled = address, port, timeout, kerberos_enabled
+    def __init__(self, address=None, port=None, timeout=None, kerberos_enabled=None, https=False, https_verify=True):
+        self.address = address
+        self.port = port
+        self.timeout = timeout
+        self.kerberos_enabled = kerberos_enabled
+        self.https = https
+        self.https_verify = https_verify
 
     def _validate_configuration(self):
         if self.address is None:
@@ -26,7 +31,10 @@ class BaseYarnAPI(object):
             raise ConfigurationError('API port is not set')
 
     def request(self, api_path, method='GET', **kwargs):
-        api_endpoint = 'http://{}:{}{}'.format(self.address, self.port, api_path)
+        if self.https:
+            api_endpoint = 'https://{}:{}{}'.format(self.address, self.port, api_path)
+        else:
+            api_endpoint = 'http://{}:{}{}'.format(self.address, self.port, api_path)
 
         self.logger.info('API Endpoint {}'.format(api_endpoint))
 
@@ -40,9 +48,9 @@ class BaseYarnAPI(object):
         response = None
         if self.kerberos_enabled:
             from requests_kerberos import HTTPKerberosAuth
-            response = requests.request(method=method, url=api_endpoint, auth=HTTPKerberosAuth(), headers=headers, **kwargs)
+            response = requests.request(method=method, url=api_endpoint, auth=HTTPKerberosAuth(), headers=headers, verify=self.https_verify, **kwargs)
         else:
-            response = requests.request(method=method, url=api_endpoint, headers=headers, **kwargs)
+            response = requests.request(method=method, url=api_endpoint, headers=headers, verify=self.https_verify, **kwargs)
 
         if response.status_code == requests.codes.ok:
             return self.response_class(response)

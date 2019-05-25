@@ -64,4 +64,6 @@ class BaseYarnAPITestCase(TestCase):
         client.port = 80
         client.timeout = 0
         client.kerberos_enabled = False
+        client.https = False
+        client.https_verify = True
         return client

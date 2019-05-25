@@ -20,13 +20,15 @@ class ResourceManager(BaseYarnAPI):
     :param int port: ResourceManager HTTP port
     :param int timeout: API connection timeout in seconds
     :param boolean kerberos_enabled: Flag identifying is Kerberos Security has been enabled for YARN
+    :param boolean https: Flag identifying HTTPS is used instead of HTTP for YARN
+    :param boolean https_verify: Flag identifying SSL certificate should be ignored in case of HTTPS
     """
-    def __init__(self, address=None, port=8088, timeout=30, kerberos_enabled=False):
+    def __init__(self, address=None, port=8088, timeout=30, kerberos_enabled=False, https=False, https_verify=True):
         if address is None:
             self.logger.debug('Get configuration from hadoop conf dir')
             address, port = get_resource_manager_host_port()
 
-        super(ResourceManager, self).__init__(address, port, timeout, kerberos_enabled)
+        super(ResourceManager, self).__init__(address, port, timeout, kerberos_enabled, https, https_verify)
 
     def cluster_information(self):
         """
