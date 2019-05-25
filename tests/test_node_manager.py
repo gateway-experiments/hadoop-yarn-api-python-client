@@ -18,10 +18,10 @@ class NodeManagerTestCase(TestCase):
     def test_node_applications(self, request_mock):
         self.nm.node_applications('RUNNING', 'root')
         request_mock.assert_called_with('/ws/v1/node/apps',
-                                        state='RUNNING', user='root')
+                                        params={"state":'RUNNING', "user":'root'})
 
         self.nm.node_applications()
-        request_mock.assert_called_with('/ws/v1/node/apps')
+        request_mock.assert_called_with('/ws/v1/node/apps', params={})
 
         with self.assertRaises(IllegalArgumentError):
             self.nm.node_applications('ololo', 'root')

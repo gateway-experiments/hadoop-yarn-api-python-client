@@ -21,11 +21,11 @@ class ApplicationMaster(BaseYarnAPI):
     :param boolean kerberos_enabled: Flag identifying is Kerberos Security has been enabled for YARN
     """
     def __init__(self, address=None, port=8088, timeout=30, kerberos_enabled=False):
-        self.address, self.port, self.timeout, self.kerberos_enabled = address, port, timeout, kerberos_enabled
         if address is None:
             self.logger.debug('Get configuration from hadoop conf dir')
             address, port = get_webproxy_host_port()
-            self.address, self.port = address, port
+
+        super(ApplicationMaster, self).__init__(address, port, timeout, kerberos_enabled)
 
     def application_information(self, application_id):
         """

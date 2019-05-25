@@ -16,7 +16,7 @@ def _get_rm_ids(hadoop_conf_path):
     return rm_ids
 
 
-def _get_resource_manager(hadoop_conf_path, rm_id = None):
+def _get_resource_manager(hadoop_conf_path, rm_id=None):
     prop_name = 'yarn.resourcemanager.webapp.address'
     if rm_id is not None:
         rm_webapp_address = parse(os.path.join(hadoop_conf_path, 'yarn-site.xml'), '%s.%s' % (prop_name, rm_id))
@@ -62,6 +62,17 @@ def get_resource_manager_host_port():
 def get_jobhistory_host_port():
     config_path = os.path.join(CONF_DIR, 'mapred-site.xml')
     prop_name = 'mapreduce.jobhistory.webapp.address'
+    value = parse(config_path, prop_name)
+    if value is not None:
+        host, _, port = value.partition(':')
+        return host, port
+    else:
+        return None
+
+
+def get_nodemanager_host_port():
+    config_path = os.path.join(CONF_DIR, 'yarn-site.xml')
+    prop_name = 'yarn.nodemanager.webapp.address'
     value = parse(config_path, prop_name)
     if value is not None:
         host, _, port = value.partition(':')

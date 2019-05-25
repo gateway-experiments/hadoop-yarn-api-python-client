@@ -21,11 +21,11 @@ class HistoryServer(BaseYarnAPI):
     :param boolean kerberos_enabled: Flag identifying is Kerberos Security has been enabled for YARN
     """
     def __init__(self, address=None, port=19888, timeout=30, kerberos_enabled=False):
-        self.address, self.port, self.timeout, self.kerberos_enabled = address, port, timeout, kerberos_enabled
         if address is None:
             self.logger.debug('Get information from hadoop conf dir')
             address, port = get_jobhistory_host_port()
-            self.address, self.port = address, port
+
+        super(HistoryServer, self).__init__(address, port, timeout, kerberos_enabled)
 
     def application_information(self):
         """
@@ -65,7 +65,7 @@ class HistoryServer(BaseYarnAPI):
         """
         path = '/ws/v1/history/mapreduce/jobs'
 
-        legal_states = set([s for s, _ in JobStateInternal])
+        legal_states = {s for s, _ in JobStateInternal}
         if state is not None and state not in legal_states:
             msg = 'Job Internal State %s is illegal' % (state,)
             raise IllegalArgumentError(msg)
@@ -82,7 +82,7 @@ class HistoryServer(BaseYarnAPI):
 
         params = self.construct_parameters(loc_args)
 
-        return self.request(path, **params)
+        return self.request(path, params=params)
 
     def job(self, job_id):
         """
@@ -134,7 +134,7 @@ class HistoryServer(BaseYarnAPI):
 
         return self.request(path)
 
-    def job_tasks(self, job_id, type=None):
+    def job_tasks(self, job_id, job_type=None):
         """
         With the tasks API, you can obtain a collection of resources that
         represent a task within a job.
@@ -151,15 +151,15 @@ class HistoryServer(BaseYarnAPI):
         # m - for map
         # r - for reduce
         valid_types = ['m', 'r']
-        if type is not None and type not in valid_types:
-            msg = 'Job type %s is illegal' % (type,)
+        if job_type is not None and job_type not in valid_types:
+            msg = 'Job type %s is illegal' % (job_type,)
             raise IllegalArgumentError(msg)
 
         params = {}
-        if type is not None:
-            params['type'] = type
+        if job_type is not None:
+            params['type'] = job_type
 
-        return self.request(path, **params)
+        return self.request(path, params=params)
 
     def job_task(self, job_id, task_id):
         """

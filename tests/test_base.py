@@ -24,7 +24,7 @@ class BaseYarnAPITestCase(TestCase):
             requests_get_mock.get('/ololo', text=json.dumps(BaseYarnAPITestCase.success_response()))
 
             client = self.get_client()
-            response = client.request('/ololo', foo='bar')
+            response = client.request('/ololo', params={"foo": 'bar'})
 
             assert requests_get_mock.called
             self.assertIn(response.data['status'], 'success')
@@ -34,7 +34,7 @@ class BaseYarnAPITestCase(TestCase):
             requests_get_mock.get('/ololo?foo=bar', text=json.dumps(BaseYarnAPITestCase.success_response()))
 
             client = self.get_client()
-            response = client.request('/ololo', foo='bar')
+            response = client.request('/ololo', params={"foo": 'bar'})
 
             assert requests_get_mock.called
             self.assertIn(response.data['status'], 'success')

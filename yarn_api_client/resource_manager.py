@@ -22,11 +22,11 @@ class ResourceManager(BaseYarnAPI):
     :param boolean kerberos_enabled: Flag identifying is Kerberos Security has been enabled for YARN
     """
     def __init__(self, address=None, port=8088, timeout=30, kerberos_enabled=False):
-        self.address, self.port, self.timeout, self.kerberos_enabled = address, port, timeout, kerberos_enabled
         if address is None:
             self.logger.debug('Get configuration from hadoop conf dir')
             address, port = get_resource_manager_host_port()
-            self.address, self.port = address, port
+
+        super(ResourceManager, self).__init__(address, port, timeout, kerberos_enabled)
 
     def cluster_information(self):
         """
@@ -94,12 +94,12 @@ class ResourceManager(BaseYarnAPI):
         """
         path = '/ws/v1/cluster/apps'
 
-        legal_states = set([s for s, _ in YarnApplicationState])
+        legal_states = {s for s, _ in YarnApplicationState}
         if state is not None and state not in legal_states:
             msg = 'Yarn Application State %s is illegal' % (state,)
             raise IllegalArgumentError(msg)
 
-        legal_final_statuses = set([s for s, _ in FinalApplicationStatus])
+        legal_final_statuses = {s for s, _ in FinalApplicationStatus}
         if final_status is not None and final_status not in legal_final_statuses:
             msg = 'Final Application Status %s is illegal' % (final_status,)
             raise IllegalArgumentError(msg)
@@ -243,7 +243,7 @@ class ResourceManager(BaseYarnAPI):
         path = '/ws/v1/cluster/apps/{appid}/state'.format(
             appid=application_id)
 
-        return self.update(path, data)
+        return self.request(path, 'PUT', data=data)
 
     def cluster_nodes(self, state=None, healthy=None):
         """
@@ -269,7 +269,7 @@ class ResourceManager(BaseYarnAPI):
         )
         params = self.construct_parameters(loc_args)
 
-        return self.request(path, **params)
+        return self.request(path, params=params)
 
     def cluster_node(self, node_id):
         """
@@ -282,3 +282,124 @@ class ResourceManager(BaseYarnAPI):
         path = '/ws/v1/cluster/nodes/{nodeid}'.format(nodeid=node_id)
 
         return self.request(path)
+
+    def cluster_submit_application(self, data):
+        """
+        With the New Application API, you can obtain an application-id which
+        can then be used as part of the Cluster Submit Applications API to
+        submit applications. The response also includes the maximum resource
+        capabilities available on the cluster.
+
+        For data body definition refer to:
+        (https://hadoop.apache.org/docs/current/hadoop-yarn/hadoop-yarn-site/ResourceManagerRest.html#Cluster_Writeable_APIs)
+
+        :param dict data: Application details
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/apps'
+
+        return self.request(path, 'POST', data=data)
+
+    def cluster_new_application(self):
+        """
+        * This feature is currently in the alpha stage and may change in the
+        future *
+
+        With the New Application API, you can obtain an application-id which
+        can then be used as part of the Cluster Submit Applications API to
+        submit applications. The response also includes the maximum resource
+        capabilities available on the cluster.
+
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/apps/new-application'
+
+        return self.request(path, 'POST')
+
+    def cluster_get_application_queue(self, application_id):
+        """
+        * This feature is currently in the alpha stage and may change in the
+        future *
+
+        With the application queue API, you can query the queue of a
+        submitted app
+
+        :param str application_id: The application id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/apps/{appid}/queue'.format(appid=application_id)
+
+        return self.request(path)
+
+    def cluster_change_application_queue(self, application_id, queue):
+        """
+        * This feature is currently in the alpha stage and may change in the
+        future *
+
+        Move a running app to another queue using a PUT request specifying the
+        target queue.
+
+        To perform the PUT operation, authentication has to be
+        setup for the RM web services. In addition, you must be authorized to
+        move the app. Currently you can only move the app if you’re using the
+        Capacity scheduler or the Fair scheduler.
+
+        Please note that in order to move an app, you must have an
+        authentication filter setup for the HTTP interface. The functionality
+        requires that a username is set in the HttpServletRequest. If no filter
+        is setup, the response will be an “UNAUTHORIZED” response.
+
+        :param str application_id: The application id
+        :param str queue: queue name
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/apps/{appid}/queue'.format(appid=application_id)
+
+        return self.request(path, 'PUT', data={"queue": queue})
+
+    def cluster_get_application_priority(self, application_id):
+        """
+        * This feature is currently in the alpha stage and may change in the
+        future *
+
+        With the application priority API, you can query the priority of a
+        submitted app
+
+        :param str application_id: The application id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/apps/{appid}/priority'.format(appid=application_id)
+
+        return self.request(path)
+
+    def cluster_change_application_priority(self, application_id, priority):
+        """
+        * This feature is currently in the alpha stage and may change in the
+        future *
+
+        Update priority of a running or accepted app using a PUT request
+        specifying the target priority.
+
+        To perform the PUT operation, authentication has to be
+        setup for the RM web services. In addition, you must be authorized to
+        move the app. Currently you can only move the app if you’re using the
+        Capacity scheduler or the Fair scheduler.
+
+        Please note that in order to move an app, you must have an
+        authentication filter setup for the HTTP interface. The functionality
+        requires that a username is set in the HttpServletRequest. If no filter
+        is setup, the response will be an “UNAUTHORIZED” response.
+
+        :param str application_id: The application id
+        :param int priority: application priority
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/apps/{appid}/priority'.format(appid=application_id)
+
+        return self.request(path, 'PUT', data={"priority": priority})

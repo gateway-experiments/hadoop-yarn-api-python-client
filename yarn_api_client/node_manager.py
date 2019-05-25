@@ -2,6 +2,7 @@
 from .base import BaseYarnAPI
 from .constants import ApplicationState
 from .errors import IllegalArgumentError
+from .hadoop_conf import get_nodemanager_host_port
 
 
 class NodeManager(BaseYarnAPI):
@@ -15,7 +16,11 @@ class NodeManager(BaseYarnAPI):
     :param boolean kerberos_enabled: Flag identifying is Kerberos Security has been enabled for YARN
     """
     def __init__(self, address=None, port=8042, timeout=30, kerberos_enabled=False):
-        self.address, self.port, self.timeout, self.kerberos_enabled = address, port, timeout, kerberos_enabled
+        if address is None:
+            self.logger.debug('Get configuration from hadoop conf dir')
+            address, port = get_nodemanager_host_port()
+
+        super(NodeManager, self).__init__(address, port, timeout, kerberos_enabled)
 
     def node_information(self):
         """
@@ -42,7 +47,7 @@ class NodeManager(BaseYarnAPI):
         """
         path = '/ws/v1/node/apps'
 
-        legal_states = set([s for s, _ in ApplicationState])
+        legal_states = {s for s, _ in ApplicationState}
         if state is not None and state not in legal_states:
             msg = 'Application State %s is illegal' % (state,)
             raise IllegalArgumentError(msg)
@@ -53,7 +58,7 @@ class NodeManager(BaseYarnAPI):
 
         params = self.construct_parameters(loc_args)
 
-        return self.request(path, **params)
+        return self.request(path, params=params)
 
     def node_application(self, application_id):
         """

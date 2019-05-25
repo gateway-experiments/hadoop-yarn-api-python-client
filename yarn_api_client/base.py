@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-import json
 import logging
 import requests
 
@@ -17,46 +16,33 @@ class BaseYarnAPI(object):
     __logger = None
     response_class = Response
 
+    def __init__(self, address=None, port=None, timeout=None, kerberos_enabled=None):
+        self.address, self.port, self.timeout, self.kerberos_enabled = address, port, timeout, kerberos_enabled
+
     def _validate_configuration(self):
         if self.address is None:
             raise ConfigurationError('API address is not set')
         elif self.port is None:
             raise ConfigurationError('API port is not set')
 
-    def request(self, api_path, **query_args):
-        params = query_args
+    def request(self, api_path, method='GET', **kwargs):
         api_endpoint = 'http://{}:{}{}'.format(self.address, self.port, api_path)
 
         self.logger.info('API Endpoint {}'.format(api_endpoint))
 
         self._validate_configuration()
 
-        response = None
-        if self.kerberos_enabled:
-            from requests_kerberos import HTTPKerberosAuth
-            response = requests.get(api_endpoint, params, auth=HTTPKerberosAuth())
+        if method == 'GET':
+            headers = None
         else:
-            response = requests.get(api_endpoint, params)
-
-        if response.status_code == requests.codes.ok:
-            return self.response_class(response)
-        else:
-            msg = 'Response finished with status: %s. Details: %s' % (response.status_code, response.text)
-            raise APIError(msg)
-
-    def update(self, api_path, data):
-        api_endpoint = 'http://{}:{}{}'.format(self.address, self.port, api_path)
-
-        self.logger.info('API Endpoint {}'.format(api_endpoint))
-
-        self._validate_configuration()
+            headers = {"Content-Type": "application/json"}
 
         response = None
         if self.kerberos_enabled:
             from requests_kerberos import HTTPKerberosAuth
-            response = requests.put(api_endpoint, data=data, auth=HTTPKerberosAuth(), headers={"Content-Type":"application/json"})
+            response = requests.request(method=method, url=api_endpoint, auth=HTTPKerberosAuth(), headers=headers, **kwargs)
         else:
-            response = requests.put(api_endpoint, data=data, headers={"Content-Type":"application/json"})
+            response = requests.request(method=method, url=api_endpoint, headers=headers, **kwargs)
 
         if response.status_code == requests.codes.ok:
             return self.response_class(response)
