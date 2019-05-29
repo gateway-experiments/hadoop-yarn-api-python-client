@@ -29,7 +29,7 @@ def _get_resource_manager(hadoop_conf_path, rm_id=None):
         return None
 
 
-def _check_is_active_rm(rm_web_host, rm_web_port):
+def check_is_active_rm(rm_web_host, rm_web_port):
     conn = HTTPConnection(rm_web_host, rm_web_port)
     try:
         conn.request('GET', '/cluster')
@@ -52,7 +52,7 @@ def get_resource_manager_host_port():
             ret = _get_resource_manager(hadoop_conf_path, rm_id)
             if ret is not None:
                 (host, port) = ret
-                if _check_is_active_rm(host, port):
+                if check_is_active_rm(host, port):
                     return host, port
         return None
     else:
