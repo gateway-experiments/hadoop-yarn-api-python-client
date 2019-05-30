@@ -5,6 +5,7 @@ try:
     from httplib import HTTPConnection, HTTPSConnection, OK
 except ImportError:
     from http.client import HTTPConnection, HTTPSConnection, OK
+from .base import Uri
 
 CONF_DIR = os.getenv('HADOOP_CONF_DIR', '/etc/hadoop/conf')
 
@@ -42,18 +43,16 @@ def _get_resource_manager(hadoop_conf_path, rm_id=None):
         prop_name = "{name}.{rm_id}".format(name=prop_name, rm_id=rm_id)
 
     rm_webapp_address = parse(os.path.join(hadoop_conf_path, 'yarn-site.xml'), prop_name)
-    if rm_webapp_address is not None:
-        [host, port] = rm_webapp_address.split(':')
-        return host, port
-    else:
-        return None
+
+    return rm_webapp_address or None
 
 
-def check_is_active_rm(rm_web_host, rm_web_port):
-    if _is_https_only():
-        conn = HTTPSConnection(rm_web_host, rm_web_port)
+def check_is_active_rm(url, timeout=30):
+    uri = Uri(url)
+    if uri.is_https:
+        conn = HTTPSConnection(host=url, timeout=timeout)
     else:
-        conn = HTTPConnection(rm_web_host, rm_web_port)
+        conn = HTTPConnection(host=url, timeout=timeout)
     try:
         conn.request('GET', '/cluster')
     except:
@@ -64,55 +63,40 @@ def check_is_active_rm(rm_web_host, rm_web_port):
     else:
         if response.getheader('Refresh', None) is not None:
             return False
-        return True
+    return True
 
 
-def get_resource_manager_host_port():
+def get_resource_manager_endpoint(timeout=30):
     hadoop_conf_path = CONF_DIR
     rm_ids = _get_rm_ids(hadoop_conf_path)
-    if rm_ids is not None:
+    if rm_ids:
         for rm_id in rm_ids:
             ret = _get_resource_manager(hadoop_conf_path, rm_id)
-            if ret is not None:
-                (host, port) = ret
-                if check_is_active_rm(host, port):
-                    return host, port
+            if ret:
+                if check_is_active_rm(ret, timeout):
+                    return ret
         return None
     else:
         return _get_resource_manager(hadoop_conf_path, None)
 
 
-def get_jobhistory_host_port():
+def get_jobhistory_endpoint():
     config_path = os.path.join(CONF_DIR, 'mapred-site.xml')
     prop_name = 'mapreduce.jobhistory.webapp.address'
-    value = parse(config_path, prop_name)
-    if value is not None:
-        host, _, port = value.partition(':')
-        return host, port
-    else:
-        return None
+    return parse(config_path, prop_name)
 
 
-def get_nodemanager_host_port():
+def get_nodemanager_endpoint():
     config_path = os.path.join(CONF_DIR, 'yarn-site.xml')
     prop_name = 'yarn.nodemanager.webapp.address'
-    value = parse(config_path, prop_name)
-    if value is not None:
-        host, _, port = value.partition(':')
-        return host, port
-    else:
-        return None
+    return parse(config_path, prop_name)
 
 
-def get_webproxy_host_port():
+def get_webproxy_endpoint(timeout=30):
     config_path = os.path.join(CONF_DIR, 'yarn-site.xml')
     prop_name = 'yarn.web-proxy.address'
     value = parse(config_path, prop_name)
-    if value is not None:
-        host, _, port = value.partition(':')
-        return host, port
-    else:
-        return get_resource_manager_host_port()
+    return value or get_resource_manager_endpoint(timeout)
 
 
 def parse(config_path, key):

@@ -6,45 +6,66 @@ import requests
 
 from .errors import APIError, ConfigurationError
 
+try:
+    from urlparse import urlparse, urlunparse
+except ImportError:
+    from urllib.parse import urlparse, urlunparse
+
 
 class Response(object):
     def __init__(self, response):
         self.data = response.json()
 
 
+class Uri(object):
+    def __init__(self, service_endpoint):
+        service_uri = urlparse(service_endpoint)
+        self.scheme = service_uri.scheme or 'http'
+        self.hostname = service_uri.hostname or service_uri.path
+        self.port = service_uri.port
+        self.is_https = service_uri.scheme == 'https' or False
+
+    def to_url(self, api_path=None):
+        if self.port:
+            result_url = urlunparse((self.scheme, self.hostname + ":" + self.port, api_path, None, None, None))
+        else:
+            result_url = urlunparse((self.scheme, self.hostname, api_path, None, None, None))
+
+        return result_url
+
+
 class BaseYarnAPI(object):
     __logger = None
     response_class = Response
 
-    def __init__(self, address=None, port=None, timeout=None, kerberos_enabled=None, is_https=False):
-        self.address, self.port, self.timeout, self.kerberos_enabled, self.is_https = \
-            address, port, timeout, kerberos_enabled, is_https
+    def __init__(self, service_endpoint=None, timeout=None, auth=None, verify=True):
+        self.timeout = timeout
+
+        if service_endpoint:
+            self.service_uri = Uri(service_endpoint)
+        else:
+            self.service_uri = None
+
+        self.session = requests.Session()
+        self.session.auth = auth
+        self.session.verify = verify
 
     def _validate_configuration(self):
-        if self.address is None:
-            raise ConfigurationError('API address is not set')
-        elif self.port is None:
-            raise ConfigurationError('API port is not set')
+        if not self.service_uri:
+            raise ConfigurationError('API endpoint is not set')
 
     def request(self, api_path, method='GET', **kwargs):
-        scheme = 'https' if self.is_https else 'http'
-        api_endpoint = '{}://{}:{}{}'.format(scheme, self.address, self.port, api_path)
+        self._validate_configuration()
+        api_endpoint = self.service_uri.to_url(api_path)
 
         self.logger.info('API Endpoint {}'.format(api_endpoint))
-
-        self._validate_configuration()
 
         if method == 'GET':
             headers = None
         else:
             headers = {"Content-Type": "application/json"}
 
-        response = None
-        if self.kerberos_enabled:
-            from requests_kerberos import HTTPKerberosAuth
-            response = requests.request(method=method, url=api_endpoint, auth=HTTPKerberosAuth(), headers=headers, **kwargs)
-        else:
-            response = requests.request(method=method, url=api_endpoint, headers=headers, **kwargs)
+        response = self.session.request(method=method, url=api_endpoint, headers=headers, timeout=self.timeout, **kwargs)
 
         if response.status_code in (200, 202):
             return self.response_class(response)

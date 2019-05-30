@@ -8,22 +8,17 @@ from yarn_api_client.errors import IllegalArgumentError
 
 @patch('yarn_api_client.resource_manager.ResourceManager.request')
 class ResourceManagerTestCase(TestCase):
-    def setUp(self):
-        self.rm = ResourceManager('localhost')
+    @patch('yarn_api_client.resource_manager.check_is_active_rm')
+    def setUp(self, check_is_active_rm_mock):
+        check_is_active_rm_mock.return_value = True
+        self.rm = ResourceManager(['localhost'])
 
-    @patch('yarn_api_client.resource_manager._is_https_only')
-    @patch('yarn_api_client.resource_manager.get_resource_manager_host_port')
-    def test__init__(self, get_config_mock, is_https_only_mock, request_mock):
-        get_config_mock.return_value = ('example', '8024')
-        is_https_only_mock.return_value = True
-
+    @patch('yarn_api_client.resource_manager.get_resource_manager_endpoint')
+    def test__init__(self, get_config_mock, request_mock):
+        get_config_mock.return_value = "https:localhost"
         rm = ResourceManager()
-
-        get_config_mock.assert_called_with()
-        self.assertEqual(rm.address, 'example')
-        self.assertEqual(rm.port, '8024')
-        is_https_only_mock.assert_called_with()
-        self.assertEqual(rm.is_https, True)
+        get_config_mock.assert_called_with(30)
+        self.assertEqual(rm.service_uri.is_https, True)
 
     def test_cluster_information(self, request_mock):
         self.rm.cluster_information()

@@ -30,10 +30,6 @@ setup(
         'requests>=2.7,<3.0',
     ],
 
-    extras_require = {
-        'kerberos': ['requests-kerberos'],
-    },
-
     entry_points = {
         'console_scripts': [
             'yarn_client = yarn_api_client.main:main',

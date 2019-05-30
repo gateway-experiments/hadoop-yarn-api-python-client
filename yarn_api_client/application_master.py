@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from .base import BaseYarnAPI
-from .hadoop_conf import get_webproxy_host_port
+from .hadoop_conf import get_webproxy_endpoint
 
 
 class ApplicationMaster(BaseYarnAPI):
@@ -15,17 +15,19 @@ class ApplicationMaster(BaseYarnAPI):
     If `address` argument is `None` client will try to extract `address` and
     `port` from Hadoop configuration files.
 
-    :param str address: Proxy HTTP address
-    :param int port: Proxy HTTP port
+    :param str service_endpoint: ApplicationMaster HTTP(S) address
     :param int timeout: API connection timeout in seconds
-    :param boolean kerberos_enabled: Flag identifying is Kerberos Security has been enabled for YARN
+    :param AuthBase auth: Auth to use for requests
+    :param boolean verify: Either a boolean, in which case it controls whether
+    we verify the server's TLS certificate, or a string, in which case it must
+    be a path to a CA bundle to use. Defaults to ``True``
     """
-    def __init__(self, address=None, port=8088, timeout=30, kerberos_enabled=False):
-        if address is None:
+    def __init__(self, service_endpoint=None, timeout=30, auth=None, verify=True):
+        if not service_endpoint:
             self.logger.debug('Get configuration from hadoop conf dir')
-            address, port = get_webproxy_host_port()
+            service_endpoint = get_webproxy_endpoint(timeout)
 
-        super(ApplicationMaster, self).__init__(address, port, timeout, kerberos_enabled)
+        super(ApplicationMaster, self).__init__(service_endpoint, timeout, auth, verify)
 
     def application_information(self, application_id):
         """
