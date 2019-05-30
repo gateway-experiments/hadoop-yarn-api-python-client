@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from .base import BaseYarnAPI
 from .constants import JobStateInternal
 from .errors import IllegalArgumentError
-from .hadoop_conf import get_jobhistory_host_port
+from .hadoop_conf import get_jobhistory_endpoint
 
 
 class HistoryServer(BaseYarnAPI):
@@ -12,20 +12,22 @@ class HistoryServer(BaseYarnAPI):
     applications. Currently it only supports MapReduce and provides
     information on finished jobs.
 
-    If `address` argument is `None` client will try to extract `address` and
-    `port` from Hadoop configuration files.
+    If `service_endpoint` argument is `None` client will try to extract it from
+    Hadoop configuration files.
 
-    :param str address: HistoryServer HTTP address
-    :param int port: HistoryServer HTTP port
+    :param str service_endpoint: HistoryServer HTTP(S) address
     :param int timeout: API connection timeout in seconds
-    :param boolean kerberos_enabled: Flag identifying is Kerberos Security has been enabled for YARN
+    :param AuthBase auth: Auth to use for requests
+    :param boolean verify: Either a boolean, in which case it controls whether
+    we verify the server's TLS certificate, or a string, in which case it must
+    be a path to a CA bundle to use. Defaults to ``True``
     """
-    def __init__(self, address=None, port=19888, timeout=30, kerberos_enabled=False):
-        if address is None:
+    def __init__(self, service_endpoint=None, timeout=30, auth=None, verify=True):
+        if not service_endpoint:
             self.logger.debug('Get information from hadoop conf dir')
-            address, port = get_jobhistory_host_port()
+            service_endpoint = get_jobhistory_endpoint()
 
-        super(HistoryServer, self).__init__(address, port, timeout, kerberos_enabled)
+        super(HistoryServer, self).__init__(service_endpoint, timeout, auth, verify)
 
     def application_information(self):
         """

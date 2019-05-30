@@ -2,7 +2,7 @@
 from .base import BaseYarnAPI
 from .constants import ApplicationState
 from .errors import IllegalArgumentError
-from .hadoop_conf import get_nodemanager_host_port
+from .hadoop_conf import get_nodemanager_endpoint
 
 
 class NodeManager(BaseYarnAPI):
@@ -10,17 +10,22 @@ class NodeManager(BaseYarnAPI):
     The NodeManager REST API's allow the user to get status on the node and
     information about applications and containers running on that node.
 
-    :param str address: NodeManager HTTP address
-    :param int port: NodeManager HTTP port
-    :param int timeout: API connection timeout in seconds
-    :param boolean kerberos_enabled: Flag identifying is Kerberos Security has been enabled for YARN
-    """
-    def __init__(self, address=None, port=8042, timeout=30, kerberos_enabled=False):
-        if address is None:
-            self.logger.debug('Get configuration from hadoop conf dir')
-            address, port = get_nodemanager_host_port()
+    If `service_endpoint` argument is `None` client will try to extract it from
+    Hadoop configuration files.
 
-        super(NodeManager, self).__init__(address, port, timeout, kerberos_enabled)
+    :param str service_endpoint: NodeManager HTTP(S) address
+    :param int timeout: API connection timeout in seconds
+    :param AuthBase auth: Auth to use for requests
+    :param boolean verify: Either a boolean, in which case it controls whether
+    we verify the server's TLS certificate, or a string, in which case it must
+    be a path to a CA bundle to use. Defaults to ``True``
+    """
+    def __init__(self, service_endpoint=None, timeout=30, auth=None, verify=True):
+        if not service_endpoint:
+            self.logger.debug('Get configuration from hadoop conf dir')
+            service_endpoint = get_nodemanager_endpoint()
+
+        super(NodeManager, self).__init__(service_endpoint, timeout, auth, verify)
 
     def node_information(self):
         """

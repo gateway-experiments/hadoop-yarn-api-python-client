@@ -10,11 +10,11 @@ class AppMasterTestCase(TestCase):
     def setUp(self):
         self.app = ApplicationMaster('localhost')
 
-    @patch('yarn_api_client.application_master.get_webproxy_host_port')
+    @patch('yarn_api_client.application_master.get_webproxy_endpoint')
     def test__init__(self, get_config_mock, request_mock):
-        get_config_mock.return_value = (None, None)
+        get_config_mock.return_value = None
         ApplicationMaster()
-        get_config_mock.assert_called_with()
+        get_config_mock.assert_called_with(30)
 
     def test_application_information(self, request_mock):
         self.app.application_information('app_100500')

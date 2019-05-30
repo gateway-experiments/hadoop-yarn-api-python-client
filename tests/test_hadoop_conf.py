@@ -50,42 +50,42 @@ class HadoopConfTestCase(TestCase):
             value = hadoop_conf.parse(f.name, key)
             self.assertEqual(None, value)
 
-    def test_get_resource_host_port(self):
+    def test_get_resource_endpoint(self):
         with patch('yarn_api_client.hadoop_conf.parse') as parse_mock:
             with patch('yarn_api_client.hadoop_conf._get_rm_ids') as get_rm_ids_mock:
                 parse_mock.return_value = 'example.com:8022'
                 get_rm_ids_mock.return_value = None
 
-                host_port = hadoop_conf.get_resource_manager_host_port()
+                endpoint = hadoop_conf.get_resource_manager_endpoint()
 
-                self.assertEqual(('example.com', '8022'), host_port)
+                self.assertEqual('example.com:8022', endpoint)
                 parse_mock.assert_called_with('/etc/hadoop/conf/yarn-site.xml',
                                               'yarn.resourcemanager.webapp.address')
 
                 parse_mock.reset_mock()
                 parse_mock.return_value = None
 
-                host_port = hadoop_conf.get_resource_manager_host_port()
-                self.assertIsNone(host_port)
+                endpoint = hadoop_conf.get_resource_manager_endpoint()
+                self.assertIsNone(endpoint)
 
     @mock.patch('yarn_api_client.hadoop_conf._get_rm_ids')
     @mock.patch('yarn_api_client.hadoop_conf.parse')
     @mock.patch('yarn_api_client.hadoop_conf.check_is_active_rm')
-    def test_get_resource_host_port_with_ha(self, check_is_active_rm_mock, parse_mock, get_rm_ids_mock):
+    def test_get_resource_endpoint_with_ha(self, check_is_active_rm_mock, parse_mock, get_rm_ids_mock):
         get_rm_ids_mock.return_value = ['rm1', 'rm2']
         parse_mock.return_value = 'example.com:8022'
         check_is_active_rm_mock.return_value = True
-        host_port = hadoop_conf.get_resource_manager_host_port()
+        endpoint = hadoop_conf.get_resource_manager_endpoint()
 
-        self.assertEqual(('example.com', '8022'), host_port)
+        self.assertEqual('example.com:8022', endpoint)
         parse_mock.assert_called_with('/etc/hadoop/conf/yarn-site.xml',
                                       'yarn.resourcemanager.webapp.address.rm1')
 
         parse_mock.reset_mock()
         parse_mock.return_value = None
 
-        host_port = hadoop_conf.get_resource_manager_host_port()
-        self.assertIsNone(host_port)
+        endpoint = hadoop_conf.get_resource_manager_endpoint()
+        self.assertIsNone(endpoint)
 
     def test_get_rm_ids(self):
         with patch('yarn_api_client.hadoop_conf.parse') as parse_mock:
@@ -116,85 +116,82 @@ class HadoopConfTestCase(TestCase):
 
         http_conn_request_mock.return_value = None
         http_getresponse_mock.return_value = ResponseMock(OK, {})
-        self.assertTrue(hadoop_conf.check_is_active_rm('example2', '8022'))
+        self.assertTrue(hadoop_conf.check_is_active_rm('example2:8022'))
         http_getresponse_mock.reset_mock()
         http_getresponse_mock.return_value = ResponseMock(OK, {'Refresh': "testing"})
-        self.assertFalse(hadoop_conf.check_is_active_rm('example2', '8022'))
+        self.assertFalse(hadoop_conf.check_is_active_rm('example2:8022'))
         http_getresponse_mock.reset_mock()
         http_getresponse_mock.return_value = ResponseMock(NOT_FOUND, {'Refresh': "testing"})
-        self.assertFalse(hadoop_conf.check_is_active_rm('example2', '8022'))
+        self.assertFalse(hadoop_conf.check_is_active_rm('example2:8022'))
         http_conn_request_mock.side_effect = Exception('error')
         http_conn_request_mock.reset_mock()
         http_conn_request_mock.return_value = None
-        self.assertFalse(hadoop_conf.check_is_active_rm('example2', '8022'))
-        pass
+        self.assertFalse(hadoop_conf.check_is_active_rm('example2:8022'))
 
     def test_get_resource_manager(self):
         with patch('yarn_api_client.hadoop_conf.parse') as parse_mock:
             parse_mock.return_value = 'example.com:8022'
 
-            host_port = hadoop_conf._get_resource_manager(hadoop_conf.CONF_DIR, None)
+            endpoint = hadoop_conf._get_resource_manager(hadoop_conf.CONF_DIR, None)
 
-            self.assertEqual(('example.com', '8022'), host_port)
+            self.assertEqual('example.com:8022', endpoint)
             parse_mock.assert_called_with('/etc/hadoop/conf/yarn-site.xml', 'yarn.resourcemanager.webapp.address')
 
-            host_port = hadoop_conf._get_resource_manager(hadoop_conf.CONF_DIR, 'rm1')
+            endpoint = hadoop_conf._get_resource_manager(hadoop_conf.CONF_DIR, 'rm1')
 
-            self.assertEqual(('example.com', '8022'), host_port)
+            self.assertEqual(('example.com:8022'), endpoint)
             parse_mock.assert_called_with('/etc/hadoop/conf/yarn-site.xml', 'yarn.resourcemanager.webapp.address.rm1')
 
             parse_mock.reset_mock()
             parse_mock.return_value = None
 
-            host_port = hadoop_conf._get_resource_manager(hadoop_conf.CONF_DIR, 'rm1')
-            self.assertIsNone(host_port)
+            endpoint = hadoop_conf._get_resource_manager(hadoop_conf.CONF_DIR, 'rm1')
+            self.assertIsNone(endpoint)
 
-    def test_get_jobhistory_host_port(self):
+    def test_get_jobhistory_endpoint(self):
         with patch('yarn_api_client.hadoop_conf.parse') as parse_mock:
             parse_mock.return_value = 'example.com:8022'
 
-            host_port = hadoop_conf.get_jobhistory_host_port()
+            endpoint = hadoop_conf.get_jobhistory_endpoint()
 
-            self.assertEqual(('example.com', '8022'), host_port)
+            self.assertEqual('example.com:8022', endpoint)
             parse_mock.assert_called_with('/etc/hadoop/conf/mapred-site.xml',
                                           'mapreduce.jobhistory.webapp.address')
 
             parse_mock.reset_mock()
             parse_mock.return_value = None
 
-            host_port = hadoop_conf.get_jobhistory_host_port()
-            self.assertIsNone(host_port)
+            endpoint = hadoop_conf.get_jobhistory_endpoint()
+            self.assertIsNone(endpoint)
 
-
-    def test_get_nodemanager_host_port(self):
+    def test_get_nodemanager_endpoint(self):
         with patch('yarn_api_client.hadoop_conf.parse') as parse_mock:
             parse_mock.return_value = 'example.com:8022'
 
-            host_port = hadoop_conf.get_nodemanager_host_port()
+            endpoint = hadoop_conf.get_nodemanager_endpoint()
 
-            self.assertEqual(('example.com', '8022'), host_port)
+            self.assertEqual('example.com:8022', endpoint)
             parse_mock.assert_called_with('/etc/hadoop/conf/yarn-site.xml',
                                           'yarn.nodemanager.webapp.address')
 
             parse_mock.reset_mock()
             parse_mock.return_value = None
 
-            host_port = hadoop_conf.get_nodemanager_host_port()
-            self.assertIsNone(host_port)
+            endpoint = hadoop_conf.get_nodemanager_endpoint()
+            self.assertIsNone(endpoint)
 
-
-    def test_get_webproxy_host_port(self):
+    def test_get_webproxy_endpoint(self):
         with patch('yarn_api_client.hadoop_conf.parse') as parse_mock:
             parse_mock.return_value = 'example.com:8022'
 
-            host_port = hadoop_conf.get_webproxy_host_port()
+            endpoint = hadoop_conf.get_webproxy_endpoint()
 
-            self.assertEqual(('example.com', '8022'), host_port)
+            self.assertEqual('example.com:8022', endpoint)
             parse_mock.assert_called_with('/etc/hadoop/conf/yarn-site.xml',
                                           'yarn.web-proxy.address')
 
             parse_mock.reset_mock()
             parse_mock.return_value = None
 
-            host_port = hadoop_conf.get_webproxy_host_port()
-            self.assertIsNone(host_port)
+            endpoint = hadoop_conf.get_webproxy_endpoint()
+            self.assertIsNone(endpoint)

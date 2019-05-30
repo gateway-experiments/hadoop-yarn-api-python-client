@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 try:
     from httplib import OK # NOQA
+    from urlparse import urlparse
 except ImportError:
     from http.client import OK # NOQA
+    from urllib.parse import urlparse
 
 import json
 import requests_mock
@@ -52,16 +54,15 @@ class BaseYarnAPITestCase(TestCase):
             requests_get_mock.get('/ololo', text=json.dumps(BaseYarnAPITestCase.success_response()))
 
             client = self.get_client()
-            client.address = None
-            client.port = 80
+            client.service_uri = None
 
             with self.assertRaises(ConfigurationError):
                 client.request('/ololo')
 
     def get_client(self):
         client = base.BaseYarnAPI()
-        client.address = 'example.com'
-        client.port = 80
+        client.service_uri = base.Uri('example.com:80')
         client.timeout = 0
-        client.kerberos_enabled = False
+        client.auth = None
+        client.verify = True
         return client
