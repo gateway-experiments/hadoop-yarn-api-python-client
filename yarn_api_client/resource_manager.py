@@ -3,9 +3,7 @@ from __future__ import unicode_literals
 from .base import BaseYarnAPI
 from .constants import YarnApplicationState, FinalApplicationStatus
 from .errors import IllegalArgumentError
-from .hadoop_conf import get_resource_manager_host_port,\
-    check_is_active_rm, _get_maximum_container_memory, CONF_DIR, \
-    _is_https_only
+from .hadoop_conf import get_resource_manager_endpoint, check_is_active_rm, CONF_DIR
 from collections import deque
 
 
@@ -16,39 +14,42 @@ class ResourceManager(BaseYarnAPI):
     scheduler information, information about nodes in the cluster,
     and information about applications on the cluster.
 
-    If `address` argument is `None` client will try to extract `address` and
-    `port` from Hadoop configuration files.  If both `address` and `alt_address`
-    are provided, the address corresponding to the ACTIVE HA Resource Manager will
+    If `service_endpoint` argument is `None` client will try to extract it from
+    Hadoop configuration files.  If both `address` and `alt_address` are
+    provided, the address corresponding to the ACTIVE HA Resource Manager will
     be used.
 
-    :param str address: ResourceManager HTTP address
-    :param int port: ResourceManager HTTP port
-    :param str alt_address: Alternate ResourceManager HTTP address for HA configurations
-    :param int alt_port: Alternate ResourceManager HTTP port for HA configurations
+    :param List[str] service_endpoints: List of ResourceManager HTTP(S)
+    addresses
     :param int timeout: API connection timeout in seconds
-    :param boolean kerberos_enabled: Flag identifying is Kerberos Security has been enabled for YARN
+    :param AuthBase auth: Auth to use for requests configurations
+    :param boolean verify: Either a boolean, in which case it controls whether
+    we verify the server's TLS certificate, or a string, in which case it must
+    be a path to a CA bundle to use. Defaults to ``True``
     """
-    def __init__(self, address=None, port=8088, alt_address=None, alt_port=8088, timeout=30, kerberos_enabled=False):
-        if address is None:
+    def __init__(self, service_endpoints=None, timeout=30, auth=None, verify=True):
+        active_service_endpoint = None
+        if not service_endpoints:
             self.logger.debug('Get configuration from hadoop conf dir: {conf_dir}'.format(conf_dir=CONF_DIR))
-            address, port = get_resource_manager_host_port()
-            is_https = _is_https_only()
+            active_service_endpoint = get_resource_manager_endpoint(timeout)
         else:
-            is_https = False
-            if alt_address:  # Determine active RM
-                if not check_is_active_rm(address, port):
-                    # Default is not active, check alternate
-                    if check_is_active_rm(alt_address, alt_port):
-                        address, port = alt_address, alt_port
-        super(ResourceManager, self).__init__(address, port, timeout, kerberos_enabled, is_https)
+            for endpoint in service_endpoints:
+                if check_is_active_rm(endpoint, timeout):
+                    active_service_endpoint = endpoint
+                    break
 
-    def get_active_host_port(self):
+        if active_service_endpoint:
+            super(ResourceManager, self).__init__(active_service_endpoint, timeout, auth, verify)
+        else:
+            raise Exception("No active RMs found")
+
+    def get_active_endpoint(self):
         """
         The active address, port tuple to which this instance is associated.
-
-        :return: Tuple (str, int) corresponding to the active address and port
+        :return: str service_endpoint: Service endpoint URL corresponding to
+        the active address of RM
         """
-        return self.address, self.port
+        return self.service_uri.to_url()
 
     def cluster_information(self):
         """

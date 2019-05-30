@@ -11,9 +11,9 @@ class HistoryServerTestCase(TestCase):
     def setUp(self):
         self.hs = HistoryServer('localhost')
 
-    @patch('yarn_api_client.history_server.get_jobhistory_host_port')
+    @patch('yarn_api_client.history_server.get_jobhistory_endpoint')
     def test__init__(self, get_config_mock, request_mock):
-        get_config_mock.return_value = (None, None)
+        get_config_mock.return_value = None
         HistoryServer()
         get_config_mock.assert_called_with()
 
