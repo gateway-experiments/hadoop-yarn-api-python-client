@@ -135,7 +135,7 @@ class ResourceManager(BaseYarnAPI):
 
         params = self.construct_parameters(loc_args)
 
-        return self.request(path, **params)
+        return self.request(path, params=params)
 
     def cluster_application_statistics(self, state_list=None,
                                        application_type_list=None):
@@ -174,7 +174,7 @@ class ResourceManager(BaseYarnAPI):
             ('applicationTypes', application_types))
         params = self.construct_parameters(loc_args)
 
-        return self.request(path, **params)
+        return self.request(path, params=params)
 
     def cluster_application(self, application_id):
         """
