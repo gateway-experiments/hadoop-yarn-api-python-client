@@ -87,6 +87,10 @@ Programmatic interface
 
 Changelog
 =========
+0.3.4 Release
+   - More flexible support for discovering Hadoop configuration
+     including multiple Resource Managers when HA is configured
+   - Properly support YARN post response codes
 
 0.3.3 Release
    - Properly set Content-Type in PUT requests
