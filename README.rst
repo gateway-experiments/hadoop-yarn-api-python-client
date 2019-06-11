@@ -87,6 +87,10 @@ Programmatic interface
 
 Changelog
 =========
+
+0.3.5 Release
+   - Hotfix release to fix internal signature mismatch
+
 0.3.4 Release
    - More flexible support for discovering Hadoop configuration
      including multiple Resource Managers when HA is configured
