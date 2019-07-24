@@ -3,8 +3,9 @@ from __future__ import unicode_literals
 from .base import BaseYarnAPI
 from .constants import YarnApplicationState, FinalApplicationStatus
 from .errors import IllegalArgumentError
-from .hadoop_conf import get_resource_manager_host_port, check_is_active_rm, CONF_DIR
-
+from .hadoop_conf import get_resource_manager_host_port,\
+    check_is_active_rm, _get_maximum_container_memory, CONF_DIR
+from collections import deque
 
 class ResourceManager(BaseYarnAPI):
     """
@@ -421,3 +422,72 @@ class ResourceManager(BaseYarnAPI):
         path = '/ws/v1/cluster/apps/{appid}/priority'.format(appid=application_id)
 
         return self.request(path, 'PUT', data={"priority": priority})
+
+    def cluster_node_container_memory(self):
+        """
+        This endpoint allows clients to gather info on the maximum memory that
+        can be allocated per container in the cluster.
+        :returns: integer specifying the maximum memory that can be allocated in
+        a container in the cluster
+        """
+
+        maximum_container_memory = _get_maximum_container_memory(CONF_DIR)
+        return maximum_container_memory
+
+    def cluster_scheduler_queue(self, yarn_queue_name):
+        """
+        Given a queue name, this function tries to locate the given queue in the object
+        returned by scheduler endpoint.
+
+        The queue can be present inside a multilevel structure. This solution tries
+        to locate the queue using breadth-first-search algorithm.
+
+        :param yarn_queue_name:
+        :return: queue
+        """
+        scheduler = self.cluster_scheduler().data
+        scheduler_info = scheduler['scheduler']['schedulerInfo']
+
+        bfs_deque = deque([scheduler_info])
+        while bfs_deque:
+            vertex = bfs_deque.popleft()
+            if vertex['queueName'] == yarn_queue_name:
+                return vertex
+            elif 'queues' in vertex:
+                for q in vertex['queues']['queue']:
+                    bfs_deque.append(q)
+
+        return None
+
+
+    def cluster_scheduler_queue_availability(self, candidate_partition, availabilty_threshold):
+        """
+        Checks whether the requested memory satisfies the available space of the queue
+        This solution takes into consideration the node label concept in cluster.
+        Following node labelling, the resources can be available in various partition.
+        Give the partition data it tells you if the used capacity of this parition is spilling
+        the threshold specified.
+
+        :param cadidate_parition:
+        :param availabilty_threshold:
+        :return: Boolean
+        """
+
+        if candidate_partition['absoluteUsedCapacity'] > availabilty_threshold:
+            return False
+        return True
+
+
+    def cluster_queue_partition(self, candidate_queue, cluster_node_label):
+        """
+        A queue can be divided into multiple partitions having different node labels.
+        Given the candidate queue and parition node label, this extracts the partition
+        we are interested in
+        :param candidate_queue:
+        :param cluster_node_label:
+        :return: partition object
+        """
+        for partition in candidate_queue['capacities']['queueCapacitiesByPartition']:
+            if partition['partitionName'] == cluster_node_label:
+                return partition
+        return None

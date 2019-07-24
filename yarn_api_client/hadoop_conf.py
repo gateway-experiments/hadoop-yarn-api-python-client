@@ -15,6 +15,9 @@ def _get_rm_ids(hadoop_conf_path):
         rm_ids = rm_ids.split(',')
     return rm_ids
 
+def _get_maximum_container_memory(hadoop_conf_path):
+    container_memory = int(parse(os.path.join(hadoop_conf_path,'yarn-site.xml'), 'yarn.nodemanager.resource.memory-mb'))
+    return container_memory
 
 def _get_resource_manager(hadoop_conf_path, rm_id=None):
     prop_name = 'yarn.resourcemanager.webapp.address'
