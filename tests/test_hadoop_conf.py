@@ -165,7 +165,6 @@ class HadoopConfTestCase(TestCase):
             host_port = hadoop_conf.get_jobhistory_host_port()
             self.assertIsNone(host_port)
 
-
     def test_get_nodemanager_host_port(self):
         with patch('yarn_api_client.hadoop_conf.parse') as parse_mock:
             parse_mock.return_value = 'example.com:8022'
@@ -181,7 +180,6 @@ class HadoopConfTestCase(TestCase):
 
             host_port = hadoop_conf.get_nodemanager_host_port()
             self.assertIsNone(host_port)
-
 
     def test_get_webproxy_host_port(self):
         with patch('yarn_api_client.hadoop_conf.parse') as parse_mock:

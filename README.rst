@@ -88,6 +88,10 @@ Programmatic interface
 Changelog
 =========
 
+0.3.6 Release
+   - Extend ResourceManager to allow applications to better
+     determine resource availability prior to submission.
+
 0.3.5 Release
    - Hotfix release to fix internal signature mismatch
 

@@ -37,10 +37,10 @@ class ResourceManagerTestCase(TestCase):
                                      user='root', queue='low', limit=10,
                                      started_time_begin=1, started_time_end=2,
                                      finished_time_begin=3, finished_time_end=4)
-        request_mock.assert_called_with('/ws/v1/cluster/apps', params={'state': 'KILLED',
-                                        'finalStatus': 'FAILED', 'user': 'root', 'queue': 'low',
-                                        'limit': 10, 'startedTimeBegin': 1, 'startedTimeEnd': 2,
-                                        'finishedTimeBegin': 3, 'finishedTimeEnd': 4})
+        request_mock.assert_called_with('/ws/v1/cluster/apps', params={'state': 'KILLED', 'finalStatus': 'FAILED',
+                                                                       'user': 'root', 'queue': 'low', 'limit': 10,
+                                                                       'startedTimeBegin': 1, 'startedTimeEnd': 2,
+                                                                       'finishedTimeBegin': 3, 'finishedTimeEnd': 4})
 
         with self.assertRaises(IllegalArgumentError):
             self.rm.cluster_applications(state='ololo')
