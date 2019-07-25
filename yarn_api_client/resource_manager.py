@@ -491,3 +491,5 @@ class ResourceManager(BaseYarnAPI):
             if partition['partitionName'] == cluster_node_label:
                 return partition
         return None
+
+
