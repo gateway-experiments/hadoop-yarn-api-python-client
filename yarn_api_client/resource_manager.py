@@ -485,7 +485,7 @@ class ResourceManager(BaseYarnAPI):
         we are interested in
         :param dict candidate_queue: queue dictionary
         :param str cluster_node_label: case sensitive node label name
-        :return: partition object
+        :return: partition Dict, None if not Found.
         """
         for partition in candidate_queue['capacities']['queueCapacitiesByPartition']:
             if partition['partitionName'] == cluster_node_label:
