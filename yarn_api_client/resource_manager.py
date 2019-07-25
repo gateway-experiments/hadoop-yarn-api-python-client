@@ -442,8 +442,8 @@ class ResourceManager(BaseYarnAPI):
         The queue can be present inside a multilevel structure. This solution tries
         to locate the queue using breadth-first-search algorithm.
 
-        :param yarn_queue_name:
-        :return: queue
+        :param str yarn_queue_name: case sensitive queue name
+        :return: queue Dictionary, None if not found
         """
         scheduler = self.cluster_scheduler().data
         scheduler_info = scheduler['scheduler']['schedulerInfo']
@@ -460,20 +460,20 @@ class ResourceManager(BaseYarnAPI):
         return None
 
 
-    def cluster_scheduler_queue_availability(self, candidate_partition, availabilty_threshold):
+    def cluster_scheduler_queue_availability(self, candidate_partition, availability_threshold):
         """
         Checks whether the requested memory satisfies the available space of the queue
         This solution takes into consideration the node label concept in cluster.
         Following node labelling, the resources can be available in various partition.
-        Give the partition data it tells you if the used capacity of this parition is spilling
+        Given the partition data it tells you if the used capacity of this partition is spilling
         the threshold specified.
 
-        :param cadidate_parition:
-        :param availabilty_threshold:
+        :param str candidate_parition: node label partition (case sensitive)
+        :param float availability_threshold: value can range between 0 - 100 .
         :return: Boolean
         """
 
-        if candidate_partition['absoluteUsedCapacity'] > availabilty_threshold:
+        if candidate_partition['absoluteUsedCapacity'] > availability_threshold:
             return False
         return True
 
@@ -483,8 +483,8 @@ class ResourceManager(BaseYarnAPI):
         A queue can be divided into multiple partitions having different node labels.
         Given the candidate queue and parition node label, this extracts the partition
         we are interested in
-        :param candidate_queue:
-        :param cluster_node_label:
+        :param dict candidate_queue: queue dictionary
+        :param str cluster_node_label: case sensitive node label name
         :return: partition object
         """
         for partition in candidate_queue['capacities']['queueCapacitiesByPartition']:
