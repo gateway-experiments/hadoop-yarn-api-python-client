@@ -4,8 +4,10 @@ from .base import BaseYarnAPI
 from .constants import YarnApplicationState, FinalApplicationStatus
 from .errors import IllegalArgumentError
 from .hadoop_conf import get_resource_manager_host_port,\
-    check_is_active_rm, _get_maximum_container_memory, CONF_DIR
+    check_is_active_rm, _get_maximum_container_memory, CONF_DIR, \
+    _is_https_only
 from collections import deque
+
 
 class ResourceManager(BaseYarnAPI):
     """
@@ -30,14 +32,16 @@ class ResourceManager(BaseYarnAPI):
         if address is None:
             self.logger.debug('Get configuration from hadoop conf dir: {conf_dir}'.format(conf_dir=CONF_DIR))
             address, port = get_resource_manager_host_port()
+            is_https = _is_https_only()
         else:
+            is_https = False
             if alt_address:  # Determine active RM
                 if not check_is_active_rm(address, port):
                     # Default is not active, check alternate
                     if check_is_active_rm(alt_address, alt_port):
                         address, port = alt_address, alt_port
 
-        super(ResourceManager, self).__init__(address, port, timeout, kerberos_enabled)
+        super(ResourceManager, self).__init__(address, port, timeout, kerberos_enabled, is_https)
 
     def get_active_host_port(self):
         """

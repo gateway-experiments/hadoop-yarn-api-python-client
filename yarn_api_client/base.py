@@ -16,8 +16,9 @@ class BaseYarnAPI(object):
     __logger = None
     response_class = Response
 
-    def __init__(self, address=None, port=None, timeout=None, kerberos_enabled=None):
-        self.address, self.port, self.timeout, self.kerberos_enabled = address, port, timeout, kerberos_enabled
+    def __init__(self, address=None, port=None, timeout=None, kerberos_enabled=None, is_https=False):
+        self.address, self.port, self.timeout, self.kerberos_enabled, self.is_https = \
+            address, port, timeout, kerberos_enabled, is_https
 
     def _validate_configuration(self):
         if self.address is None:
@@ -26,7 +27,8 @@ class BaseYarnAPI(object):
             raise ConfigurationError('API port is not set')
 
     def request(self, api_path, method='GET', **kwargs):
-        api_endpoint = 'http://{}:{}{}'.format(self.address, self.port, api_path)
+        scheme = 'https' if self.is_https else 'http'
+        api_endpoint = '{}://{}:{}{}'.format(scheme, self.address, self.port, api_path)
 
         self.logger.info('API Endpoint {}'.format(api_endpoint))
 
