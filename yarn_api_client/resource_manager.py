@@ -40,7 +40,6 @@ class ResourceManager(BaseYarnAPI):
                     # Default is not active, check alternate
                     if check_is_active_rm(alt_address, alt_port):
                         address, port = alt_address, alt_port
-
         super(ResourceManager, self).__init__(address, port, timeout, kerberos_enabled, is_https)
 
     def get_active_host_port(self):

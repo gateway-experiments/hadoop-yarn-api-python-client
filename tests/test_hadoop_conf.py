@@ -28,6 +28,14 @@ yarn_site_xml = """\
     <name>yarn.resourcemanager.webapp.address</name>
     <value>localhost:8022</value>
   </property>
+  <property>
+    <name>yarn.resourcemanager.webapp.https.address</name>
+    <value>localhost:8024</value>
+  </property>
+  <property>
+    <name>yarn.http.policy</name>
+    <value>HTTPS_ONLY</value>
+  </property>
 </configuration>
 """.encode('latin1')
 
@@ -42,11 +50,27 @@ class HadoopConfTestCase(TestCase):
             value = hadoop_conf.parse(f.name, key)
             self.assertEqual('localhost:8022', value)
 
+            key = 'yarn.resourcemanager.webapp.https.address'
+            value = hadoop_conf.parse(f.name, key)
+            self.assertEqual('localhost:8024', value)
+
+            key = 'yarn.http.policy'
+            value = hadoop_conf.parse(f.name, key)
+            self.assertEqual('HTTPS_ONLY', value)
+
         with NamedTemporaryFile() as f:
             f.write(empty_config)
             f.flush()
 
             key = 'yarn.resourcemanager.webapp.address'
+            value = hadoop_conf.parse(f.name, key)
+            self.assertEqual(None, value)
+
+            key = 'yarn.resourcemanager.webapp.https.address'
+            value = hadoop_conf.parse(f.name, key)
+            self.assertEqual(None, value)
+
+            key = 'yarn.http.policy'
             value = hadoop_conf.parse(f.name, key)
             self.assertEqual(None, value)
 
@@ -100,9 +124,10 @@ class HadoopConfTestCase(TestCase):
             rm_list = hadoop_conf._get_rm_ids(hadoop_conf.CONF_DIR)
             self.assertIsNone(rm_list)
 
+    @mock.patch('yarn_api_client.hadoop_conf._is_https_only')
     @mock.patch(_http_request_method)
     @mock.patch(_http_getresponse_method)
-    def test_check_is_active_rm(self, http_getresponse_mock, http_conn_request_mock):
+    def test_check_is_active_rm(self, http_getresponse_mock, http_conn_request_mock, is_https_only_mock):
         class ResponseMock():
             def __init__(self, status, header_dict):
                 self.status = status
@@ -114,6 +139,7 @@ class HadoopConfTestCase(TestCase):
                 else:
                     return default_return
 
+        is_https_only_mock.return_value = False
         http_conn_request_mock.return_value = None
         http_getresponse_mock.return_value = ResponseMock(OK, {})
         self.assertTrue(hadoop_conf.check_is_active_rm('example2', '8022'))
