@@ -4,7 +4,6 @@ from tests import TestCase
 
 from yarn_api_client.resource_manager import ResourceManager
 from yarn_api_client.errors import IllegalArgumentError
-from yarn_api_client.hadoop_conf import _is_https_only
 
 
 @patch('yarn_api_client.resource_manager.ResourceManager.request')
