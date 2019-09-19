@@ -50,9 +50,9 @@ def _get_resource_manager(hadoop_conf_path, rm_id=None):
 def check_is_active_rm(url, timeout=30):
     uri = Uri(url)
     if uri.is_https:
-        conn = HTTPSConnection(host=url, timeout=timeout)
+        conn = HTTPSConnection(host=uri.hostname, port=uri.port, timeout=timeout)
     else:
-        conn = HTTPConnection(host=url, timeout=timeout)
+        conn = HTTPConnection(host=uri.hostname, port=uri.port, timeout=timeout)
     try:
         conn.request('GET', '/cluster')
     except:

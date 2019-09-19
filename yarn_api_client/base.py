@@ -26,10 +26,11 @@ class Uri(object):
         self.is_https = service_uri.scheme == 'https' or False
 
     def to_url(self, api_path=None):
+        path = api_path or ''
         if self.port:
-            result_url = urlunparse((self.scheme, self.hostname + ":" + self.port, api_path, None, None, None))
+            result_url = urlunparse((self.scheme, self.hostname + ":" + str(self.port), path, None, None, None))
         else:
-            result_url = urlunparse((self.scheme, self.hostname, api_path, None, None, None))
+            result_url = urlunparse((self.scheme, self.hostname, path, None, None, None))
 
         return result_url
 
