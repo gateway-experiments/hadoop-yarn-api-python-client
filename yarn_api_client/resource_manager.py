@@ -3,8 +3,51 @@ from __future__ import unicode_literals
 from .base import BaseYarnAPI
 from .constants import YarnApplicationState, FinalApplicationStatus
 from .errors import IllegalArgumentError
-from .hadoop_conf import get_resource_manager_endpoint, check_is_active_rm, CONF_DIR
+from .hadoop_conf import get_resource_manager_endpoint, check_is_active_rm, CONF_DIR, _get_maximum_container_memory
 from collections import deque
+
+LEGAL_STATES = {s for s, _ in YarnApplicationState}
+LEGAL_FINAL_STATUSES = {s for s, _ in FinalApplicationStatus}
+
+
+def validate_yarn_application_state(state, required=False):
+    if state:
+        if state not in LEGAL_STATES:
+            msg = 'Yarn Application State %s is illegal' % (state,)
+            raise IllegalArgumentError(msg)
+    else:
+        if required:
+            msg = "state argument is required to be provided"
+            raise IllegalArgumentError(msg)
+
+
+def validate_yarn_application_states(states, required=False):
+    if states:
+        if not isinstance(states, list):
+            msg = "States should be list"
+            raise IllegalArgumentError(msg)
+
+        illegal_states = set(states) - LEGAL_STATES
+        if illegal_states:
+            msg = 'Yarn Application States %s are illegal' % (
+                ",".join(illegal_states),
+            )
+            raise IllegalArgumentError(msg)
+    else:
+        if required:
+            msg = "states argument is required to be provided"
+            raise IllegalArgumentError(msg)
+
+
+def validate_final_application_status(final_status, required=False):
+    if final_status:
+        if final_status not in LEGAL_FINAL_STATUSES:
+            msg = 'Final Application Status %s is illegal' % (final_status,)
+            raise IllegalArgumentError(msg)
+    else:
+        if required:
+            msg = "final_status argument is required to be provided"
+            raise IllegalArgumentError(msg)
 
 
 class ResourceManager(BaseYarnAPI):
@@ -88,17 +131,22 @@ class ResourceManager(BaseYarnAPI):
         path = '/ws/v1/cluster/scheduler'
         return self.request(path)
 
-    def cluster_applications(self, state=None, final_status=None,
-                             user=None, queue=None, limit=None,
+    def cluster_applications(self, state=None, states=None,
+                             final_status=None, user=None,
+                             queue=None, limit=None,
                              started_time_begin=None, started_time_end=None,
-                             finished_time_begin=None, finished_time_end=None):
+                             finished_time_begin=None, finished_time_end=None,
+                             application_types=None, application_tags=None,
+                             de_selects=None):
         """
         With the Applications API, you can obtain a collection of resources,
         each of which represents an application.
 
-        :param str state: state of the application
-        :param str final_status: the final status of the
-            application - reported by the application itself
+        :param str state: state of the application [deprecated]
+        :param List[str] states: applications matching the given application
+            states
+        :param str final_status: the final status of the application -
+            reported by the application itself
         :param str user: user name
         :param str queue: queue name
         :param str limit: total number of app objects to be returned
@@ -110,6 +158,12 @@ class ResourceManager(BaseYarnAPI):
             beginning with this time, specified in ms since epoch
         :param str finished_time_end: applications with finish time ending
             with this time, specified in ms since epoch
+        :param List[str] application_types: applications matching the given
+            application types, specified as a comma-separated list
+        :param List[str] application_tags: applications matching any of the
+            given application tags, specified as a comma-separated list
+        :param List[str] de_selects: a generic fields which will be skipped in
+            the result
         :returns: API response object with JSON data
         :rtype: :py:class:`yarn_api_client.base.Response`
         :raises yarn_api_client.errors.IllegalArgumentError: if `state` or
@@ -117,18 +171,13 @@ class ResourceManager(BaseYarnAPI):
         """
         path = '/ws/v1/cluster/apps'
 
-        legal_states = {s for s, _ in YarnApplicationState}
-        if state is not None and state not in legal_states:
-            msg = 'Yarn Application State %s is illegal' % (state,)
-            raise IllegalArgumentError(msg)
-
-        legal_final_statuses = {s for s, _ in FinalApplicationStatus}
-        if final_status is not None and final_status not in legal_final_statuses:
-            msg = 'Final Application Status %s is illegal' % (final_status,)
-            raise IllegalArgumentError(msg)
+        validate_yarn_application_state(state)
+        validate_yarn_application_states(states)
+        validate_final_application_status(final_status)
 
         loc_args = (
             ('state', state),
+            ('states', ','.join(states) if states else None),
             ('finalStatus', final_status),
             ('user', user),
             ('queue', queue),
@@ -136,14 +185,18 @@ class ResourceManager(BaseYarnAPI):
             ('startedTimeBegin', started_time_begin),
             ('startedTimeEnd', started_time_end),
             ('finishedTimeBegin', finished_time_begin),
-            ('finishedTimeEnd', finished_time_end))
+            ('finishedTimeEnd', finished_time_end),
+            ('applicationTypes', ','.join(application_types) if application_types else None),
+            ('applicationTags', ','.join(application_tags) if application_tags else None),
+            ('deSelects', ','.join(de_selects) if de_selects else None)
+        )
 
         params = self.construct_parameters(loc_args)
 
         return self.request(path, params=params)
 
-    def cluster_application_statistics(self, state_list=None,
-                                       application_type_list=None):
+    def cluster_application_statistics(self, states=None,
+                                       application_types=None):
         """
         With the Application Statistics API, you can obtain a collection of
         triples, each of which contains the application type, the application
@@ -152,10 +205,10 @@ class ResourceManager(BaseYarnAPI):
 
         This method work in Hadoop > 2.0.0
 
-        :param list state_list: states of the applications, specified as a
-            comma-separated list. If states is not provided, the API will
-            enumerate all application states and return the counts of them.
-        :param list application_type_list: types of the applications,
+        :param List[str] states: states of the applications. If states is not
+            provided, the API will enumerate all application states and
+            return the counts of them.
+        :param List[str] application_types: types of the applications,
             specified as a comma-separated list. If application_types is not
             provided, the API will count the applications of any application
             type. In this case, the response shows * to indicate any
@@ -167,16 +220,12 @@ class ResourceManager(BaseYarnAPI):
         """
         path = '/ws/v1/cluster/appstatistics'
 
-        # TODO: validate state argument
-        states = ','.join(state_list) if state_list is not None else None
-        if application_type_list is not None:
-            application_types = ','.join(application_type_list)
-        else:
-            application_types = None
+        validate_yarn_application_states(states)
 
         loc_args = (
-            ('states', states),
-            ('applicationTypes', application_types))
+            ('states', ','.join(states) if states else None),
+            ('applicationTypes', ','.join(application_types) if application_types else None)
+        )
         params = self.construct_parameters(loc_args)
 
         return self.request(path, params=params)
@@ -240,6 +289,9 @@ class ResourceManager(BaseYarnAPI):
 
     def cluster_application_state(self, application_id):
         """
+        * This feature is currently in the alpha stage and may change in the
+        future *
+
         With the application state API, you can obtain the current
         state of an application.
 
@@ -254,6 +306,9 @@ class ResourceManager(BaseYarnAPI):
 
     def cluster_application_kill(self, application_id):
         """
+        * This feature is currently in the alpha stage and may change in the
+        future *
+
         With the application kill API, you can kill an application
         that is not in FINISHED or FAILED state.
 
@@ -268,27 +323,25 @@ class ResourceManager(BaseYarnAPI):
 
         return self.request(path, 'PUT', data=data)
 
-    def cluster_nodes(self, state=None, healthy=None):
+    def cluster_nodes(self, states=None):
         """
         With the Nodes API, you can obtain a collection of resources, each of
         which represents a node.
 
+        :param List[str] states: the states of the node, specified as a
+            comma-separated list valid values are: NEW, RUNNING, UNHEALTHY,
+            DECOMMISSIONING, DECOMMISSIONED, LOST, REBOOTED, SHUTDOWN
         :returns: API response object with JSON data
         :rtype: :py:class:`yarn_api_client.base.Response`
         :raises yarn_api_client.errors.IllegalArgumentError: if `healthy`
             incorrect
         """
         path = '/ws/v1/cluster/nodes'
-        # TODO: validate state argument
 
-        legal_healthy = ['true', 'false']
-        if healthy is not None and healthy not in legal_healthy:
-            msg = 'Valid Healthy arguments are true, false'
-            raise IllegalArgumentError(msg)
+        validate_yarn_application_states(states)
 
         loc_args = (
-            ('state', state),
-            ('healthy', healthy),
+            ('states', ','.join(states) if states else None),
         )
         params = self.construct_parameters(loc_args)
 
@@ -308,6 +361,9 @@ class ResourceManager(BaseYarnAPI):
 
     def cluster_submit_application(self, data):
         """
+        * This feature is currently in the alpha stage and may change in the
+        future *
+
         With the New Application API, you can obtain an application-id which
         can then be used as part of the Cluster Submit Applications API to
         submit applications. The response also includes the maximum resource
@@ -440,11 +496,11 @@ class ResourceManager(BaseYarnAPI):
 
     def cluster_scheduler_queue(self, yarn_queue_name):
         """
-        Given a queue name, this function tries to locate the given queue in the object
-        returned by scheduler endpoint.
+        Given a queue name, this function tries to locate the given queue in
+        the object returned by scheduler endpoint.
 
-        The queue can be present inside a multilevel structure. This solution tries
-        to locate the queue using breadth-first-search algorithm.
+        The queue can be present inside a multilevel structure. This solution
+        tries to locate the queue using breadth-first-search algorithm.
 
         :param str yarn_queue_name: case sensitive queue name
         :return: queue Dictionary, None if not found
@@ -463,7 +519,6 @@ class ResourceManager(BaseYarnAPI):
 
         return None
 
-
     def cluster_scheduler_queue_availability(self, candidate_partition, availability_threshold):
         """
         Checks whether the requested memory satisfies the available space of the queue
@@ -481,7 +536,6 @@ class ResourceManager(BaseYarnAPI):
             return False
         return True
 
-
     def cluster_queue_partition(self, candidate_queue, cluster_node_label):
         """
         A queue can be divided into multiple partitions having different node labels.
@@ -495,5 +549,4 @@ class ResourceManager(BaseYarnAPI):
             if partition['partitionName'] == cluster_node_label:
                 return partition
         return None
-
 

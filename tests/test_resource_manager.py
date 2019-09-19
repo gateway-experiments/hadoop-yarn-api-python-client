@@ -36,17 +36,32 @@ class ResourceManagerTestCase(TestCase):
         self.rm.cluster_applications()
         request_mock.assert_called_with('/ws/v1/cluster/apps', params={})
 
-        self.rm.cluster_applications(state='KILLED', final_status='FAILED',
-                                     user='root', queue='low', limit=10,
+        self.rm.cluster_applications(state='KILLED', states=['KILLED'],
+                                     final_status='FAILED', user='root',
+                                     queue='low', limit=10,
                                      started_time_begin=1, started_time_end=2,
-                                     finished_time_begin=3, finished_time_end=4)
-        request_mock.assert_called_with('/ws/v1/cluster/apps', params={'state': 'KILLED', 'finalStatus': 'FAILED',
-                                                                       'user': 'root', 'queue': 'low', 'limit': 10,
-                                                                       'startedTimeBegin': 1, 'startedTimeEnd': 2,
-                                                                       'finishedTimeBegin': 3, 'finishedTimeEnd': 4})
+                                     finished_time_begin=3, finished_time_end=4,
+                                     application_types=['YARN'],
+                                     application_tags=['apptag'],
+                                     de_selects=['resouceRequests'])
+        request_mock.assert_called_with('/ws/v1/cluster/apps', params={
+            'state': 'KILLED',
+            'states': 'KILLED',
+            'finalStatus': 'FAILED',
+            'user': 'root',
+            'queue': 'low',
+            'limit': 10,
+            'startedTimeBegin': 1,
+            'startedTimeEnd': 2,
+            'finishedTimeBegin': 3,
+            'finishedTimeEnd': 4,
+            'applicationTypes': 'YARN',
+            'applicationTags': 'apptag',
+            'deSelects': 'resouceRequests'
+        })
 
         with self.assertRaises(IllegalArgumentError):
-            self.rm.cluster_applications(state='ololo')
+            self.rm.cluster_applications(states=['ololo'])
 
         with self.assertRaises(IllegalArgumentError):
             self.rm.cluster_applications(final_status='ololo')
@@ -68,12 +83,12 @@ class ResourceManagerTestCase(TestCase):
         self.rm.cluster_nodes()
         request_mock.assert_called_with('/ws/v1/cluster/nodes', params={})
 
-        self.rm.cluster_nodes(state='NEW', healthy='true')
+        self.rm.cluster_nodes(states=['NEW'])
         request_mock.assert_called_with('/ws/v1/cluster/nodes',
-                                        params={"state": 'NEW', "healthy": 'true'})
+                                        params={"states": 'NEW'})
 
         with self.assertRaises(IllegalArgumentError):
-            self.rm.cluster_nodes(state='NEW', healthy='ololo')
+            self.rm.cluster_nodes(states=['ololo'])
 
     def test_cluster_node(self, request_mock):
         self.rm.cluster_node('node_1')
