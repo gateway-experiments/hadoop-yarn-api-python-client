@@ -66,6 +66,9 @@ class BaseYarnAPI(object):
         else:
             headers = {"Content-Type": "application/json"}
 
+        if 'headers' in kwargs and kwargs['headers']:
+            headers.update(kwargs['headers'])
+
         response = self.session.request(method=method, url=api_endpoint, headers=headers, timeout=self.timeout, **kwargs)
 
         if response.status_code in (200, 202):

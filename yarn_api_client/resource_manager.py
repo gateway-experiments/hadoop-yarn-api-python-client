@@ -287,6 +287,22 @@ class ResourceManager(BaseYarnAPI):
 
         return self.request(path)
 
+    def cluster_application_attempt_container_info(self, application_id, attempt_id, container_id):
+        """
+        With the application attempts API, you can obtain an information
+        about container related to an application attempt.
+
+        :param str application_id: The application id
+        :param str attempt_id: The attempt id
+        :param str container_id: The container id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/apps/{appid}/appattempts/{attemptid}/containers/{containerid}'.format(
+            appid=application_id, attemptid=attempt_id, containerid=container_id)
+
+        return self.request(path)
+
     def cluster_application_state(self, application_id):
         """
         * This feature is currently in the alpha stage and may change in the
@@ -317,7 +333,7 @@ class ResourceManager(BaseYarnAPI):
         :rtype: :py:class:`yarn_api_client.base.Response`
         """
 
-        data = '{"state": "KILLED"}'
+        data = {"state": "KILLED"}
         path = '/ws/v1/cluster/apps/{appid}/state'.format(
             appid=application_id)
 
@@ -491,8 +507,7 @@ class ResourceManager(BaseYarnAPI):
         a container in the cluster
         """
 
-        maximum_container_memory = _get_maximum_container_memory(CONF_DIR)
-        return maximum_container_memory
+        return _get_maximum_container_memory(CONF_DIR)
 
     def cluster_scheduler_queue(self, yarn_queue_name):
         """
@@ -514,8 +529,8 @@ class ResourceManager(BaseYarnAPI):
             if vertex['queueName'] == yarn_queue_name:
                 return vertex
             elif 'queues' in vertex:
-                for q in vertex['queues']['queue']:
-                    bfs_deque.append(q)
+                for queue in vertex['queues']['queue']:
+                    bfs_deque.append(queue)
 
         return None
 
@@ -550,3 +565,262 @@ class ResourceManager(BaseYarnAPI):
                 return partition
         return None
 
+    def cluster_reservations(self, queue=None, reservation_id=None,
+                             start_time=None, end_time=None,
+                             include_resource_allocations=None):
+        """
+        The Cluster Reservation API can be used to list reservations. When listing reservations
+        the user must specify the constraints in terms of a queue, reservation-id, start time or
+        end time. The user must also specify whether or not to include the full resource allocations
+        of the reservations being listed. The resulting page returns a response containing
+        information related to the reservation such as the acceptance time, the user, the resource
+        allocations, the reservation-id, as well as the reservation definition.
+
+        :param str queue: the queue name containing the reservations to be listed. if not set, this
+            value will default to “default”
+        :param str reservation_id: the reservation-id of the reservation which will be listed. If
+            this parameter is present, start-time and end-time will be ignored.
+        :param str start_time:  reservations that end after this start-time will be listed. If
+            unspecified or invalid, this will default to 0.
+        :param str end_time: reservations that start after this end-time will be listed. If
+            unspecified or invalid, this will default to Long.MaxValue.
+        :param str include_resource_allocations : true or false. If true, the resource allocations
+            of the reservation will be included in the response. If false, no resource allocations
+            will be included in the response. This will default to false.
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/reservation/list'
+
+        loc_args = (
+            ('queue', queue),
+            ('reservation-id', reservation_id),
+            ('start-time', start_time),
+            ('end-time', end_time),
+            ('include-resource-allocations', include_resource_allocations)
+        )
+
+        params = self.construct_parameters(loc_args)
+
+        return self.request(path, params=params)
+
+    def cluster_new_delegation_token(self, renewer):
+        """
+        * This feature is currently in the alpha stage and may change in the
+        future *
+
+        API to create delegation token.
+
+        All delegation token requests must be carried out on a Kerberos
+        authenticated connection(using SPNEGO). Carrying out operations on a non-kerberos
+        connection will result in a FORBIDDEN response. In case of renewing a token, only
+        the renewer specified when creating the token can renew the token. Other users(including
+        the owner) are forbidden from renewing tokens.
+
+        :param str renewer: The user who is allowed to renew the delegation token
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/delegation-token'
+
+        return self.request(path, 'POST', data={"renewer": renewer})
+
+    def cluster_renew_delegation_token(self, delegation_token):
+        """
+        * This feature is currently in the alpha stage and may change in the
+        future *
+
+        API to renew delegation token.
+
+        All delegation token requests must be carried out on a Kerberos
+        authenticated connection(using SPNEGO). Carrying out operations on a non-kerberos
+        connection will result in a FORBIDDEN response. In case of renewing a token, only
+        the renewer specified when creating the token can renew the token. Other users(including
+        the owner) are forbidden from renewing tokens.
+
+        :param str delegation_token: Delegation token
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/delegation-token/expiration'
+
+        return self.request(path, 'POST', headers={
+            "Hadoop-YARN-RM-Delegation-Token": delegation_token
+        })
+
+    def cluster_cancel_delegation_token(self, delegation_token):
+        """
+        * This feature is currently in the alpha stage and may change in the
+        future *
+
+        API to cancel delegation token.
+
+        All delegation token requests must be carried out on a Kerberos
+        authenticated connection(using SPNEGO). Carrying out operations on a non-kerberos
+        connection will result in a FORBIDDEN response.
+
+        :param str delegation_token: Delegation token
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/delegation-token'
+
+        return self.request(path, 'DELETE', headers={
+            "Hadoop-YARN-RM-Delegation-Token": delegation_token
+        })
+
+    def cluster_new_reservation(self):
+        """
+        * This feature is currently in the alpha stage and may change in the
+        future *
+
+        Use the New Reservation API, to obtain a reservation-id which can then be used as part of
+        the Cluster Reservation API Submit to submit reservations.
+
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/reservation/new-reservation'
+
+        return self.request(path, 'POST')
+
+    def cluster_submit_reservation(self, data):
+        """
+        The Cluster Reservation API can be used to submit reservations. When submitting a
+        reservation the user specifies the constraints in terms of resources, and time that is
+        required. The resulting response is successful if the reservation can be made. If a
+        reservation-id is used to submit a reservation multiple times, the request will succeed
+        if the reservation definition is the same, but only one reservation will be created. If
+        the reservation definition is different, the server will respond with an error response.
+        When the reservation is made, the user can use the reservation-id used to submit the
+        reservation to get access to the resources by specifying it as part of Cluster Submit
+        Applications API.
+
+        For data body definition refer to:
+        (https://hadoop.apache.org/docs/current/hadoop-yarn/hadoop-yarn-site/ResourceManagerRest.html#Cluster_Reservation_API_Submit)
+
+        :param dict data: Reservation details
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/reservation/submit'
+
+        return self.request(path, 'POST', data=data)
+
+    def cluster_update_reservation(self, data):
+        """
+        The Cluster Reservation API Update can be used to update existing reservations.Update of a
+        Reservation works similarly to submit described above, but the user submits the
+        reservation-id of an existing reservation to be updated. The semantics is a try-and-swap,
+        successful operation will modify the existing reservation based on the requested update
+        parameter, while a failed execution will leave the existing reservation unchanged.
+
+        For data body definition refer to:
+        (https://hadoop.apache.org/docs/current/hadoop-yarn/hadoop-yarn-site/ResourceManagerRest.html#Cluster_Reservation_API_Update)
+
+        :param dict data: Reservation details
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/reservation/update'
+
+        return self.request(path, 'POST', data=data)
+
+    def cluster_delete_reservation(self, reservation_id):
+        """
+        The Cluster Reservation API Update can be used to update existing reservations.Update of a
+        Reservation works similarly to submit described above, but the user submits the
+        reservation-id of an existing reservation to be updated. The semantics is a try-and-swap,
+        successful operation will modify the existing reservation based on the requested update
+        parameter, while a failed execution will leave the existing reservation unchanged.
+
+        :param str reservation_id: The id of the reservation to be deleted (the system automatically
+            looks up the right queue from this)
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/reservation/delete'
+
+        return self.request(path, 'POST', data={'reservation-id': reservation_id})
+
+    def cluster_application_timeouts(self, application_id):
+        """
+        Cluster Application Timeouts API can be used to get all configured timeouts of an
+        application. When you run a GET operation on this resource, a collection of timeout objects
+        is returned. Each timeout object is composed of a timeout type, expiry-time and remaining
+        time in seconds.
+
+        :param str application_id: The application id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/apps/{appid}/timeouts'.format(
+            appid=application_id)
+
+        return self.request(path)
+
+    def cluster_application_timeout(self, application_id, timeout_type):
+        """
+        The Cluster Application Timeout resource contains information about timeout.
+
+        :param str application_id: The application id
+        :param str timeout_type:Timeout type. Valid values are the members of the
+            ApplicationTimeoutType enum. LIFETIME is currently the only valid value. .
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/apps/{appid}/timeouts/{timeout_type}'.format(
+            appid=application_id, timeout_type=timeout_type)
+
+        return self.request(path)
+
+    def cluster_update_application_timeout(self, application_id, timeout_type, expiry_time):
+        """
+        Update timeout of an application for given timeout type.
+
+        :param str application_id: The application id
+        :param str timeout_type: Timeout type. Valid values are the members of the
+            ApplicationTimeoutType enum. LIFETIME is currently the only valid value.
+        :param str expiry_time: Time at which the application will expire in
+            ISO8601 yyyy-MM-dd’T’HH:mm:ss.SSSZ format.
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/apps/{appid}/timeout'.format(appid=application_id)
+
+        return self.request(path, 'PUT', data={
+            "timeout": {"type": timeout_type, "expiryTime": expiry_time}
+        })
+
+    def cluster_scheduler_conf_mutation(self):
+        """
+        * This feature is currently in the alpha stage and may change in the
+        future *
+
+        API to retrieve the scheduler’s configuration that is currently loaded into
+        scheduler’s context.
+
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/scheduler-conf'
+
+        return self.request(path)
+
+    def cluster_modify_scheduler_conf_mutation(self, data):
+        """
+        * This feature is currently in the alpha stage and may change in the
+        future *
+
+        API to modify the scheduler configuration
+
+        For data body definition refer to:
+        (https://hadoop.apache.org/docs/current/hadoop-yarn/hadoop-yarn-site/ResourceManagerRest.html#Scheduler_Configuration_Mutation_API)
+
+        :param dict data: sched-conf dictionary object
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/scheduler-conf'
+
+        return self.request(path, 'PUT', data=data)

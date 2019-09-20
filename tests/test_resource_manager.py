@@ -79,13 +79,36 @@ class ResourceManagerTestCase(TestCase):
         self.rm.cluster_application_attempts('app_1')
         request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/appattempts')
 
+    def test_cluster_application_attempt_info(self, request_mock):
+        self.rm.cluster_application_attempt_info('app_1', 'attempt_1')
+        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/appattempts/attempt_1')
+
+    def test_cluster_application_attempt_containers(self, request_mock):
+        self.rm.cluster_application_attempt_containers('app_1', 'attempt_1')
+        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/appattempts/attempt_1/containers')
+
+    def test_cluster_application_attempt_container_info(self, request_mock):
+        self.rm.cluster_application_attempt_container_info('app_1', 'attempt_1', 'container_1')
+        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/appattempts/attempt_1/containers/container_1')
+
+    def test_cluster_application_state(self, request_mock):
+        self.rm.cluster_application_state('app_1')
+        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/state')
+
+    def test_cluster_application_kill(self, request_mock):
+        self.rm.cluster_application_kill('app_1')
+        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/state', 'PUT', data={
+            "state": 'KILLED'
+        })
+
     def test_cluster_nodes(self, request_mock):
         self.rm.cluster_nodes()
         request_mock.assert_called_with('/ws/v1/cluster/nodes', params={})
 
         self.rm.cluster_nodes(states=['NEW'])
-        request_mock.assert_called_with('/ws/v1/cluster/nodes',
-                                        params={"states": 'NEW'})
+        request_mock.assert_called_with('/ws/v1/cluster/nodes', params={
+            "states": 'NEW'
+        })
 
         with self.assertRaises(IllegalArgumentError):
             self.rm.cluster_nodes(states=['ololo'])
@@ -94,10 +117,11 @@ class ResourceManagerTestCase(TestCase):
         self.rm.cluster_node('node_1')
         request_mock.assert_called_with('/ws/v1/cluster/nodes/node_1')
 
-    # TODO
-    # def test_cluster_submit_application(self, request_mock):
-    #     self.rm.cluster_submit_application()
-    #     request_mock.assert_called_with('/ws/v1/cluster/apps')
+    def test_cluster_submit_application(self, request_mock):
+        self.rm.cluster_submit_application({"application-name": "dummy_application"})
+        request_mock.assert_called_with('/ws/v1/cluster/apps', 'POST', data={
+            "application-name": "dummy_application"
+        })
 
     def test_cluster_new_application(self, request_mock):
         self.rm.cluster_new_application()
@@ -109,7 +133,9 @@ class ResourceManagerTestCase(TestCase):
 
     def test_cluster_change_application_queue(self, request_mock):
         self.rm.cluster_change_application_queue('app_1', 'queue_1')
-        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/queue', 'PUT', data={"queue": 'queue_1'})
+        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/queue', 'PUT', data={
+            "queue": 'queue_1'
+        })
 
     def test_cluster_get_application_priority(self, request_mock):
         self.rm.cluster_get_application_priority('app_1')
@@ -117,4 +143,110 @@ class ResourceManagerTestCase(TestCase):
 
     def test_cluster_change_application_priority(self, request_mock):
         self.rm.cluster_change_application_priority('app_1', 'priority_1')
-        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/priority', 'PUT', data={"priority": 'priority_1'})
+        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/priority', 'PUT', data={
+            "priority": 'priority_1'
+        })
+
+    # TODO
+    # def test_cluster_node_container_memory(self, request_mock):
+    #    self.rm.cluster_node_container_memory()
+    #    some_assert()
+
+    # TODO
+    # def test_cluster_scheduler_queue(self, request_mock):
+    #    self.rm.blabla()
+    #    request_mock.assert_called_with('cluster_scheduler_queue')
+
+    # TODO
+    # def test_cluster_scheduler_queue_availability(self, request_mock):
+    #    self.rm.blabla()
+    #    request_mock.assert_called_with('blabla')
+
+    # TODO
+    # def test_cluster_queue_partition(self, request_mock):
+    #    self.rm.blabla()
+    #    request_mock.assert_called_with('blabla')
+
+    def test_cluster_reservations(self, request_mock):
+        self.rm.cluster_reservations('queue_1', 'reservation_1', 0, 5, True)
+        request_mock.assert_called_with('/ws/v1/cluster/reservation/list', params={
+            "queue": "queue_1",
+            "reservation-id": "reservation_1",
+            "start-time": 0,
+            "end-time": 5,
+            "include-resource-allocations": True
+        })
+
+    def test_cluster_new_delegation_token(self, request_mock):
+        self.rm.cluster_new_delegation_token('renewer_1')
+        request_mock.assert_called_with('/ws/v1/cluster/delegation-token', 'POST', data={
+            "renewer": "renewer_1"
+        })
+
+    def test_cluster_renew_delegation_token(self, request_mock):
+        self.rm.cluster_renew_delegation_token('delegation_token_1')
+        request_mock.assert_called_with('/ws/v1/cluster/delegation-token/expiration', 'POST', headers={
+            "Hadoop-YARN-RM-Delegation-Token": 'delegation_token_1'
+        })
+
+    def test_cluster_cancel_delegation_token(self, request_mock):
+        self.rm.cluster_cancel_delegation_token('delegation_token_1')
+        request_mock.assert_called_with('/ws/v1/cluster/delegation-token', 'DELETE', headers={
+            "Hadoop-YARN-RM-Delegation-Token": 'delegation_token_1'
+        })
+
+    def test_cluster_new_reservation(self, request_mock):
+        self.rm.cluster_new_reservation()
+        request_mock.assert_called_with('/ws/v1/cluster/reservation/new-reservation', 'POST')
+
+    def test_cluster_submit_reservation(self, request_mock):
+        self.rm.cluster_submit_reservation({'reservation-id': 'reservation_1'})
+        request_mock.assert_called_with('/ws/v1/cluster/reservation/submit', 'POST', data={
+            'reservation-id': 'reservation_1'
+        })
+
+    def test_cluster_update_reservation(self, request_mock):
+        self.rm.cluster_update_reservation({
+            'reservation-id': 'reservation_1'
+        })
+        request_mock.assert_called_with('/ws/v1/cluster/reservation/update', 'POST', data={
+            'reservation-id': 'reservation_1'
+        })
+
+    def test_cluster_delete_reservation(self, request_mock):
+        self.rm.cluster_delete_reservation('reservation_1')
+        request_mock.assert_called_with('/ws/v1/cluster/reservation/delete', 'POST', data={
+            'reservation-id': 'reservation_1'
+        })
+
+    def test_cluster_application_timeouts(self, request_mock):
+        self.rm.cluster_application_timeouts('app_1')
+        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/timeouts')
+
+    def test_cluster_application_timeout(self, request_mock):
+        self.rm.cluster_application_timeout('app_1', 'LIFETIME')
+        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/timeouts/LIFETIME')
+
+    def test_cluster_update_application_timeout(self, request_mock):
+        self.rm.cluster_update_application_timeout('app_1', 'LIFETIME', '2016-12-05T22:51:00.104+0530')
+        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/timeout', 'PUT', data={
+            'timeout': {'type': 'LIFETIME', 'expiryTime': '2016-12-05T22:51:00.104+0530'}
+        })
+
+    def test_cluster_scheduler_conf_mutation(self, request_mock):
+        self.rm.cluster_scheduler_conf_mutation()
+        request_mock.assert_called_with('/ws/v1/cluster/scheduler-conf')
+
+    def test_cluster_modify_scheduler_conf_mutation(self, request_mock):
+        self.rm.cluster_modify_scheduler_conf_mutation({
+            'queue-name': 'queue_1',
+            'params': {
+                'test': 'test'
+            }
+        })
+        request_mock.assert_called_with('/ws/v1/cluster/scheduler-conf', 'PUT', data={
+            'queue-name': 'queue_1',
+            'params': {
+                'test': 'test'
+            }
+        })
