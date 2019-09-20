@@ -4,6 +4,19 @@ from .constants import ApplicationState
 from .errors import IllegalArgumentError
 from .hadoop_conf import get_nodemanager_endpoint
 
+LEGAL_APPLICATION_STATES = {s for s, _ in ApplicationState}
+
+
+def validate_application_state(state, required=False):
+    if state:
+        if state not in LEGAL_APPLICATION_STATES:
+            msg = 'Application State %s is illegal' % (state,)
+            raise IllegalArgumentError(msg)
+    else:
+        if required:
+            msg = "state argument is required to be provided"
+            raise IllegalArgumentError(msg)
+
 
 class NodeManager(BaseYarnAPI):
     """
@@ -52,10 +65,7 @@ class NodeManager(BaseYarnAPI):
         """
         path = '/ws/v1/node/apps'
 
-        legal_states = {s for s, _ in ApplicationState}
-        if state is not None and state not in legal_states:
-            msg = 'Application State %s is illegal' % (state,)
-            raise IllegalArgumentError(msg)
+        validate_application_state(state)
 
         loc_args = (
             ('state', state),
