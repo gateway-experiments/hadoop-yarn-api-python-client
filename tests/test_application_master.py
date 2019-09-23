@@ -29,7 +29,7 @@ class AppMasterTestCase(TestCase):
         request_mock.assert_called_with('/proxy/app_100500/ws/v1/mapreduce/jobs/job_100500')
 
     def test_job_attempts(self, request_mock):
-        self.app.job_attempts('app_1')
+        self.app.job_attempts('app_1', 'job_2')
 
     def test_job_counters(self, request_mock):
         self.app.job_counters('app_1', 'job_2')
@@ -57,9 +57,21 @@ class AppMasterTestCase(TestCase):
 
     def test_task_attempt(self, request_mock):
         self.app.task_attempt('app_1', 'job_2', 'task_3', 'attempt_4')
-        request_mock.assert_called_with('/proxy/app_1/ws/v1/mapreduce/jobs/job_2/tasks/task_3/attempt/attempt_4')
+        request_mock.assert_called_with('/proxy/app_1/ws/v1/mapreduce/jobs/job_2/tasks/task_3/attempts/attempt_4')
+
+    def test_task_attempt_state(self, request_mock):
+        self.app.task_attempt_state('app_1', 'job_2', 'task_3', 'attempt_4')
+        request_mock.assert_called_with('/proxy/app_1/ws/v1/mapreduce/jobs/job_2/tasks/task_3/attempts/attempt_4/state')
+
+    def test_task_attempt_state_kill(self, request_mock):
+        self.app.task_attempt_state_kill('app_1', 'job_2', 'task_3', 'attempt_4')
+        request_mock.assert_called_with(
+            '/proxy/app_1/ws/v1/mapreduce/jobs/job_2/tasks/task_3/attempts/attempt_4/state',
+            'PUT', data={'state': 'KILLED'}
+        )
 
     def test_task_attempt_counters(self, request_mock):
         self.app.task_attempt_counters('app_1', 'job_2', 'task_3', 'attempt_4')
         request_mock.assert_called_with(
-            '/proxy/app_1/ws/v1/mapreduce/jobs/job_2/tasks/task_3/attempt/attempt_4/counters')
+            '/proxy/app_1/ws/v1/mapreduce/jobs/job_2/tasks/task_3/attempts/attempt_4/counters'
+        )
