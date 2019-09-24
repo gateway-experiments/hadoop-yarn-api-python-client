@@ -147,25 +147,106 @@ class ResourceManagerTestCase(TestCase):
             "priority": 'priority_1'
         })
 
-    # TODO
-    # def test_cluster_node_container_memory(self, request_mock):
-    #    self.rm.cluster_node_container_memory()
-    #    some_assert()
+    @patch('yarn_api_client.hadoop_conf.parse')
+    def test_cluster_node_container_memory(self, parse_mock, request_mock):
+        parse_mock.return_value = 1024
+        value = self.rm.cluster_node_container_memory()
+        self.assertEqual(value, 1024)
 
     # TODO
     # def test_cluster_scheduler_queue(self, request_mock):
-    #    self.rm.blabla()
-    #    request_mock.assert_called_with('cluster_scheduler_queue')
+    #     class ResponseMock():
+    #         def __init__(self, status, data):
+    #             self.status = status
+    #             self.data = data
 
-    # TODO
-    # def test_cluster_scheduler_queue_availability(self, request_mock):
-    #    self.rm.blabla()
-    #    request_mock.assert_called_with('blabla')
+    #     request_mock.return_value = ResponseMock(
+    #         'OK',
+    #         {
+    #             'scheduler': {
+    #                 'schedulerInfo': {
+    #                     "queues": {
+    #                         "queue": [
+    #                             {
+    #                                 'queueName': 'queue_1',
+    #                                 'queues': {
+    #                                     'queue': [
+    #                                         {
+    #                                             "queueName": 'queue_2',
+    #                                             'queues': {
+    #                                                 'queue': [
+    #                                                     {
+    #                                                         'queueName': 'queue_3'
+    #                                                     }
+    #                                                 ]
+    #                                             }
+    #                                         }
+    #                                     ]
+    #                                 }
+    #                             }
+    #                         ]
+    #                     }
+    #                 }
+    #             }
+    #         }
+    #     )
+    #     value = self.rm.cluster_scheduler_queue('queue_1')
+    #     self.assertIsNotNone(value)
 
-    # TODO
-    # def test_cluster_queue_partition(self, request_mock):
-    #    self.rm.blabla()
-    #    request_mock.assert_called_with('blabla')
+    #     request_mock.return_value = ResponseMock(
+    #         'OK',
+    #         {
+    #             'scheduler': {
+    #                 'schedulerInfo': {
+    #                     'queueName': 'queue_1'
+    #                 }
+    #             }
+    #         }
+    #     )
+    #     value = self.rm.cluster_scheduler_queue('queue_2')
+    #     self.assertIsNone(value)
+
+    def test_cluster_scheduler_queue_availability(self, request_mock):
+        value = self.rm.cluster_scheduler_queue_availability({'absoluteUsedCapacity': 90}, 70)
+        self.assertEqual(value, False)
+
+        value = self.rm.cluster_scheduler_queue_availability({'absoluteUsedCapacity': 50}, 70)
+        self.assertEqual(value, True)
+
+    def test_cluster_queue_partition(self, request_mock):
+        value = self.rm.cluster_queue_partition(
+            {
+                'capacities': {
+                    'queueCapacitiesByPartition': [
+                        {
+                            'partitionName': 'label_1'
+                        },
+                        {
+                            'partitionName': 'label_2'
+                        }
+                    ]
+                },
+            },
+            'label_1'
+        )
+        self.assertIsNotNone(value)
+
+        value = self.rm.cluster_queue_partition(
+            {
+                'capacities': {
+                    'queueCapacitiesByPartition': [
+                        {
+                            'partitionName': 'label_1'
+                        },
+                        {
+                            'partitionName': 'label_2'
+                        }
+                    ]
+                },
+            },
+            'label_3'
+        )
+        self.assertIsNone(value)
 
     def test_cluster_reservations(self, request_mock):
         self.rm.cluster_reservations('queue_1', 'reservation_1', 0, 5, True)
