@@ -73,16 +73,21 @@ class ApplicationMaster(BaseYarnAPI):
 
         return self.request(path)
 
-    def job_attempts(self, job_id):
+    def job_attempts(self, application_id, job_id):
         """
         With the job attempts API, you can obtain a collection of resources
         that represent the job attempts.
 
+        :param str application_id: The application id
         :param str job_id: The job id
         :returns: API response object with JSON data
         :rtype: :py:class:`yarn_api_client.base.Response`
         """
-        pass
+
+        path = '/proxy/{appid}/ws/v1/mapreduce/jobs/{jobid}/jobattempts'.format(
+            appid=application_id, jobid=job_id)
+
+        return self.request(path)
 
     def job_counters(self, application_id, job_id):
         """
@@ -189,11 +194,48 @@ class ApplicationMaster(BaseYarnAPI):
         :returns: API response object with JSON data
         :rtype: :py:class:`yarn_api_client.base.Response`
         """
-        path = '/proxy/{appid}/ws/v1/mapreduce/jobs/{jobid}/tasks/{taskid}/attempt/{attemptid}'.format(
+        path = '/proxy/{appid}/ws/v1/mapreduce/jobs/{jobid}/tasks/{taskid}/attempts/{attemptid}'.format(
             appid=application_id, jobid=job_id, taskid=task_id,
             attemptid=attempt_id)
 
         return self.request(path)
+
+    def task_attempt_state(self, application_id, job_id, task_id, attempt_id):
+        """
+        With the task attempt state API, you can query the state of a submitted
+        task attempt.
+
+        :param str application_id: The application id
+        :param str job_id: The job id
+        :param str task_id: The task id
+        :param str attempt_id: The attempt id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/proxy/{appid}/ws/v1/mapreduce/jobs/{jobid}/tasks/{taskid}/attempts/{attemptid}/state'.format(
+            appid=application_id, jobid=job_id, taskid=task_id,
+            attemptid=attempt_id)
+
+        return self.request(path)
+
+    def task_attempt_state_kill(self, application_id, job_id, task_id, attempt_id):
+        """
+        Kill specific attempt using task attempt state API.
+
+        :param str application_id: The application id
+        :param str job_id: The job id
+        :param str task_id: The task id
+        :param str attempt_id: The attempt id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        data = {"state": "KILLED"}
+
+        path = '/proxy/{appid}/ws/v1/mapreduce/jobs/{jobid}/tasks/{taskid}/attempts/{attemptid}/state'.format(
+            appid=application_id, jobid=job_id, taskid=task_id,
+            attemptid=attempt_id)
+
+        return self.request(path, 'PUT', data=data)
 
     def task_attempt_counters(self, application_id, job_id, task_id, attempt_id):
         """
@@ -207,7 +249,7 @@ class ApplicationMaster(BaseYarnAPI):
         :returns: API response object with JSON data
         :rtype: :py:class:`yarn_api_client.base.Response`
         """
-        path = '/proxy/{appid}/ws/v1/mapreduce/jobs/{jobid}/tasks/{taskid}/attempt/{attemptid}/counters'.format(
+        path = '/proxy/{appid}/ws/v1/mapreduce/jobs/{jobid}/tasks/{taskid}/attempts/{attemptid}/counters'.format(
             appid=application_id, jobid=job_id, taskid=task_id,
             attemptid=attempt_id)
 
