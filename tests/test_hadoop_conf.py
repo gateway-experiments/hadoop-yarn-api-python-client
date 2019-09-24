@@ -6,7 +6,8 @@ from mock import patch
 from tests import TestCase
 
 from yarn_api_client import hadoop_conf
-
+import platform
+import os
 
 _http_request_method = ''
 _http_getresponse_method = ''
@@ -19,6 +20,11 @@ except ImportError:
     from http.client import HTTPConnection, OK, NOT_FOUND # NOQA
     _http_request_method = 'http.client.HTTPConnection.request'
     _http_getresponse_method = 'http.client.HTTPConnection.getresponse'
+
+if platform.system() == 'Windows':
+    hadoop_conf_path = '/etc/hadoop/conf\\'
+else:
+    hadoop_conf_path = '/etc/hadoop/conf/'
 
 empty_config = '<configuration></configuration>'.encode('latin1')
 
@@ -42,9 +48,13 @@ yarn_site_xml = """\
 
 class HadoopConfTestCase(TestCase):
     def test_parse(self):
-        with NamedTemporaryFile() as f:
+        temp_filename = None
+
+        with NamedTemporaryFile(delete=False) as f:
             f.write(yarn_site_xml)
             f.flush()
+            f.close()
+            temp_filename = f.name
 
             key = 'yarn.resourcemanager.webapp.address'
             value = hadoop_conf.parse(f.name, key)
@@ -57,10 +67,13 @@ class HadoopConfTestCase(TestCase):
             key = 'yarn.http.policy'
             value = hadoop_conf.parse(f.name, key)
             self.assertEqual('HTTPS_ONLY', value)
+        os.remove(temp_filename)
 
-        with NamedTemporaryFile() as f:
+        with NamedTemporaryFile(delete=False) as f:
             f.write(empty_config)
             f.flush()
+            f.close()
+            temp_filename = f.name
 
             key = 'yarn.resourcemanager.webapp.address'
             value = hadoop_conf.parse(f.name, key)
@@ -73,6 +86,7 @@ class HadoopConfTestCase(TestCase):
             key = 'yarn.http.policy'
             value = hadoop_conf.parse(f.name, key)
             self.assertEqual(None, value)
+        os.remove(temp_filename)
 
     def test_get_resource_endpoint(self):
         with patch('yarn_api_client.hadoop_conf.parse') as parse_mock:
@@ -83,7 +97,7 @@ class HadoopConfTestCase(TestCase):
                 endpoint = hadoop_conf.get_resource_manager_endpoint()
 
                 self.assertEqual('example.com:8022', endpoint)
-                parse_mock.assert_called_with('/etc/hadoop/conf/yarn-site.xml',
+                parse_mock.assert_called_with(hadoop_conf_path + 'yarn-site.xml',
                                               'yarn.resourcemanager.webapp.address')
 
                 parse_mock.reset_mock()
@@ -102,7 +116,7 @@ class HadoopConfTestCase(TestCase):
         endpoint = hadoop_conf.get_resource_manager_endpoint()
 
         self.assertEqual('example.com:8022', endpoint)
-        parse_mock.assert_called_with('/etc/hadoop/conf/yarn-site.xml',
+        parse_mock.assert_called_with(hadoop_conf_path + 'yarn-site.xml',
                                       'yarn.resourcemanager.webapp.address.rm1')
 
         parse_mock.reset_mock()
@@ -116,7 +130,7 @@ class HadoopConfTestCase(TestCase):
             parse_mock.return_value = 'rm1,rm2'
             rm_list = hadoop_conf._get_rm_ids(hadoop_conf.CONF_DIR)
             self.assertEqual(['rm1', 'rm2'], rm_list)
-            parse_mock.assert_called_with('/etc/hadoop/conf/yarn-site.xml', 'yarn.resourcemanager.ha.rm-ids')
+            parse_mock.assert_called_with(hadoop_conf_path + 'yarn-site.xml', 'yarn.resourcemanager.ha.rm-ids')
 
             parse_mock.reset_mock()
             parse_mock.return_value = None
@@ -161,12 +175,12 @@ class HadoopConfTestCase(TestCase):
             endpoint = hadoop_conf._get_resource_manager(hadoop_conf.CONF_DIR, None)
 
             self.assertEqual('example.com:8022', endpoint)
-            parse_mock.assert_called_with('/etc/hadoop/conf/yarn-site.xml', 'yarn.resourcemanager.webapp.address')
+            parse_mock.assert_called_with(hadoop_conf_path + 'yarn-site.xml', 'yarn.resourcemanager.webapp.address')
 
             endpoint = hadoop_conf._get_resource_manager(hadoop_conf.CONF_DIR, 'rm1')
 
             self.assertEqual(('example.com:8022'), endpoint)
-            parse_mock.assert_called_with('/etc/hadoop/conf/yarn-site.xml', 'yarn.resourcemanager.webapp.address.rm1')
+            parse_mock.assert_called_with(hadoop_conf_path + 'yarn-site.xml', 'yarn.resourcemanager.webapp.address.rm1')
 
             parse_mock.reset_mock()
             parse_mock.return_value = None
@@ -181,7 +195,7 @@ class HadoopConfTestCase(TestCase):
             endpoint = hadoop_conf.get_jobhistory_endpoint()
 
             self.assertEqual('example.com:8022', endpoint)
-            parse_mock.assert_called_with('/etc/hadoop/conf/mapred-site.xml',
+            parse_mock.assert_called_with(hadoop_conf_path + 'mapred-site.xml',
                                           'mapreduce.jobhistory.webapp.address')
 
             parse_mock.reset_mock()
@@ -197,7 +211,7 @@ class HadoopConfTestCase(TestCase):
             endpoint = hadoop_conf.get_nodemanager_endpoint()
 
             self.assertEqual('example.com:8022', endpoint)
-            parse_mock.assert_called_with('/etc/hadoop/conf/yarn-site.xml',
+            parse_mock.assert_called_with(hadoop_conf_path + 'yarn-site.xml',
                                           'yarn.nodemanager.webapp.address')
 
             parse_mock.reset_mock()
@@ -213,7 +227,7 @@ class HadoopConfTestCase(TestCase):
             endpoint = hadoop_conf.get_webproxy_endpoint()
 
             self.assertEqual('example.com:8022', endpoint)
-            parse_mock.assert_called_with('/etc/hadoop/conf/yarn-site.xml',
+            parse_mock.assert_called_with(hadoop_conf_path + 'yarn-site.xml',
                                           'yarn.web-proxy.address')
 
             parse_mock.reset_mock()
