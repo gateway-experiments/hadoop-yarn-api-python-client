@@ -62,9 +62,12 @@ class BaseYarnAPI(object):
         self.logger.info('API Endpoint {}'.format(api_endpoint))
 
         if method == 'GET':
-            headers = None
+            headers = {}
         else:
             headers = {"Content-Type": "application/json"}
+
+        if 'headers' in kwargs and kwargs['headers']:
+            headers.update(kwargs['headers'])
 
         response = self.session.request(method=method, url=api_endpoint, headers=headers, timeout=self.timeout, **kwargs)
 
