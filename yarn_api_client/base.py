@@ -62,7 +62,7 @@ class BaseYarnAPI(object):
         self.logger.info('API Endpoint {}'.format(api_endpoint))
 
         if method == 'GET':
-            headers = None
+            headers = {}
         else:
             headers = {"Content-Type": "application/json"}
 
