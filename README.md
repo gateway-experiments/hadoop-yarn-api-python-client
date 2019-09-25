@@ -60,7 +60,7 @@ PS: You __**need**__ to get valid kerberos ticket in systemwide kerberos cache b
 
 2. Second option - using `gssapi` package  
 
-If you want to avoid using terminal calls, you have to perform SPNEGO handshake to retrieve ticket yourself. Full API documentation: https://pythongssapi.github.iQ/python-gssapi/latest/_
+If you want to avoid using terminal calls, you have to perform SPNEGO handshake to retrieve ticket yourself. Full API documentation: https://pythongssapi.github.io/python-gssapi/latest/
 
 # Usage
 
