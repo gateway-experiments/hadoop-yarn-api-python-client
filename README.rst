@@ -24,6 +24,10 @@ Package documentation: python-client-for-hadoop-yarn-api.readthedocs.org_
 
 REST API documentation: hadoop.apache.org_
 
+Library is compatible with Hadoop 3.2.1
+If u have version other than mentioned, certain APIs might be not working or have differences in implementation.
+If u plan to use certain API long-term, you might want to make sure its not in Alpha stage in documentation.
+
 ------------
 Installation
 ------------
@@ -50,7 +54,10 @@ From source code
    popd
 
 
-Enabling support for Kerberos/SPNEGO Security
+=============
+Enabling support for Kerberos/SPNEGO Security  
+=============
+1. First option - using `requests_kerberos` package  
 
 To avoid deployment issues on a non Kerberized environment, the `requests_kerberos`
 dependency is optional and needs to be explicit installed in order to enable access
@@ -59,6 +66,19 @@ to YARN console protected by Kerberos/SPNEGO.
 ::
 
    pip install requests_kerberos
+
+::
+
+  from yarn_api_client.history_server import HistoryServer
+  from requests_kerberos import HTTPKerberosAuth
+  history_server = HistoryServer('https://127.0.0.2:5678', auth=HTTPKerberosAuth())
+
+
+PS: You need to get valid kerberos ticket in systemwide kerberos cache before running your code, otherwise calls to kerberized environment won't go through (run kinit before proceeding to run code)
+
+2. Second option - using `gssapi` package  
+
+If you want to avoid using terminal calls, you have to perform SPNEGO handshake to retrieve ticket yourself. Full API documentation: https://pythongssapi.github.iQ/python-gssapi/latest/_
 
 
 -----
