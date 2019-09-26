@@ -86,9 +86,28 @@ app_information = am.application_information('application_id')
 
 ### Changelog
 
+1.0.0 Release
+   - Major cleanup of API.  
+     - Address/port parameters have been replaced with complete 
+       endpoints (includes scheme [e.g., http or https]). 
+     - ResourceManager has been updated to take a list of endpoints for 
+       improved HA support.
+     - ResourceManager, ApplicationMaster, HistoryServer and NodeManager
+       have been updated with methods corresponding to the latest REST API.
+   - pytest support on Windows has been provided.
+   - Documentation has been updated.
+
+   **NOTE:** Applications using APIs relative to releases prior to 1.0 should
+   pin their dependency on yarn-api-client to _less than_ 1.0 and are encouraged
+   to update to 1.0 as soon as possible.
+
+0.3.7 Release  
+   - Honor configured HTTP Policy when no address is provided - enabling 
+     using of HTTPS in these cases.
+
 0.3.6 Release  
-   - Extend ResourceManager to allow appli
-     determine resource availability prior to submission.
+   - Extend ResourceManager to allow applications to determine
+     resource availability prior to submission.
 
 0.3.5 Release  
    - Hotfix release to fix internal signature mismatch
