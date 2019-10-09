@@ -49,9 +49,8 @@ def check_is_active_rm(url, timeout=30, auth=None, verify=True):
     except:
         return False
 
-    if response.status_code == 401:
-        raise Exception("401 Unauthorized")
-    elif response.status_code != 200:
+    if response.status_code != 200:
+        print("Error to access RM - {}:{}".format(response.status_code, response.text))
         return False
     else:
         return True

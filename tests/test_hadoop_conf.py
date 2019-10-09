@@ -166,9 +166,8 @@ class HadoopConfTestCase(TestCase):
 
         # Error scenario (necessary Auth is not provided or invalid credentials)
         with requests_mock.mock() as requests_get_mock:
-            with getattr(self, _mock_exception_method)(Exception, "401 Unauthorized"):
-                requests_get_mock.get('https://example2:8022/cluster', status_code=401)
-                hadoop_conf.check_is_active_rm('https://example2:8022')
+            requests_get_mock.get('https://example2:8022/cluster', status_code=401)
+            self.assertFalse(hadoop_conf.check_is_active_rm('https://example2:8022'))
 
         # Emulate requests library exception (socket timeout, etc)
         with requests_mock.mock() as requests_get_mock:
