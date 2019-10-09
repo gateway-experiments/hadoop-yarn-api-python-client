@@ -17,7 +17,7 @@ class ResourceManagerTestCase(TestCase):
     def test__init__(self, get_config_mock, request_mock):
         get_config_mock.return_value = "https:localhost"
         rm = ResourceManager()
-        get_config_mock.assert_called_with(30)
+        get_config_mock.assert_called_with(30, None, True)
         self.assertEqual(rm.service_uri.is_https, True)
 
     def test_cluster_information(self, request_mock):

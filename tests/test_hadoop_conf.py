@@ -5,9 +5,16 @@ import mock
 from mock import patch
 from tests import TestCase
 
+import requests_mock
 from yarn_api_client import hadoop_conf
 import platform
 import os
+import sys
+
+if sys.version_info[0] == 2:
+    _mock_exception_method = 'assertRaisesRegexp'
+else:
+    _mock_exception_method = 'assertRaisesRegex'
 
 _http_request_method = ''
 _http_getresponse_method = ''
@@ -139,34 +146,36 @@ class HadoopConfTestCase(TestCase):
             self.assertIsNone(rm_list)
 
     @mock.patch('yarn_api_client.hadoop_conf._is_https_only')
-    @mock.patch(_http_request_method)
-    @mock.patch(_http_getresponse_method)
-    def test_check_is_active_rm(self, http_getresponse_mock, http_conn_request_mock, is_https_only_mock):
-        class ResponseMock():
-            def __init__(self, status, header_dict):
-                self.status = status
-                self.header_dict = header_dict
-
-            def getheader(self, header_key, default_return):
-                if header_key in self.header_dict:
-                    return self.header_dict[header_key]
-                else:
-                    return default_return
-
+    def test_check_is_active_rm(self, is_https_only_mock):
         is_https_only_mock.return_value = False
-        http_conn_request_mock.return_value = None
-        http_getresponse_mock.return_value = ResponseMock(OK, {})
-        self.assertTrue(hadoop_conf.check_is_active_rm('example2:8022'))
-        http_getresponse_mock.reset_mock()
-        http_getresponse_mock.return_value = ResponseMock(OK, {'Refresh': "testing"})
-        self.assertFalse(hadoop_conf.check_is_active_rm('example2:8022'))
-        http_getresponse_mock.reset_mock()
-        http_getresponse_mock.return_value = ResponseMock(NOT_FOUND, {'Refresh': "testing"})
-        self.assertFalse(hadoop_conf.check_is_active_rm('example2:8022'))
-        http_conn_request_mock.side_effect = Exception('error')
-        http_conn_request_mock.reset_mock()
-        http_conn_request_mock.return_value = None
-        self.assertFalse(hadoop_conf.check_is_active_rm('example2:8022'))
+
+        # Success scenario
+        with requests_mock.mock() as requests_get_mock:
+            requests_get_mock.get('https://example2:8022/cluster', status_code=200)
+            self.assertTrue(hadoop_conf.check_is_active_rm('https://example2:8022'))
+
+        # Outage scenario
+        with requests_mock.mock() as requests_get_mock:
+            requests_get_mock.get('https://example2:8022/cluster', status_code=500)
+            self.assertFalse(hadoop_conf.check_is_active_rm('https://example2:8022'))
+
+        # Error scenario (URL is wrong - not found)
+        with requests_mock.mock() as requests_get_mock:
+            requests_get_mock.get('https://example2:8022/cluster', status_code=404)
+            self.assertFalse(hadoop_conf.check_is_active_rm('https://example2:8022'))
+
+        # Error scenario (necessary Auth is not provided or invalid credentials)
+        with requests_mock.mock() as requests_get_mock:
+            with getattr(self, _mock_exception_method)(Exception, "401 Unauthorized"):
+                requests_get_mock.get('https://example2:8022/cluster', status_code=401)
+                hadoop_conf.check_is_active_rm('https://example2:8022')
+
+        # Emulate requests library exception (socket timeout, etc)
+        with requests_mock.mock() as requests_get_mock:
+            requests_get_mock.side_effect = Exception('error')
+            # requests_get_mock.get('https://example2:8022/cluster', status_code=200)
+            requests_get_mock.return_value = None
+            self.assertFalse(hadoop_conf.check_is_active_rm('https://example2:8022'))
 
     def test_get_resource_manager(self):
         with patch('yarn_api_client.hadoop_conf.parse') as parse_mock:

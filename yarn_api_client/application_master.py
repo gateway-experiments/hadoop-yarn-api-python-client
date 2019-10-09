@@ -25,7 +25,7 @@ class ApplicationMaster(BaseYarnAPI):
     def __init__(self, service_endpoint=None, timeout=30, auth=None, verify=True):
         if not service_endpoint:
             self.logger.debug('Get configuration from hadoop conf dir')
-            service_endpoint = get_webproxy_endpoint(timeout)
+            service_endpoint = get_webproxy_endpoint(timeout, auth, verify)
 
         super(ApplicationMaster, self).__init__(service_endpoint, timeout, auth, verify)
 
