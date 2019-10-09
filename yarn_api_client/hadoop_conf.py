@@ -50,7 +50,7 @@ def check_is_active_rm(url, timeout=30, auth=None, verify=True):
         return False
 
     if response.status_code != 200:
-        print("Error to access RM - {}:{}".format(response.status_code, response.text))
+        print("Error to access RM - HTTP Code {}".format(response.status_code))
         return False
     else:
         return True
