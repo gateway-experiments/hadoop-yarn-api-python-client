@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import xml.etree.ElementTree as ET
-try:
-    from httplib import HTTPConnection, HTTPSConnection, OK
-except ImportError:
-    from http.client import HTTPConnection, HTTPSConnection, OK
-from .base import Uri
+import requests
 
 CONF_DIR = os.getenv('HADOOP_CONF_DIR', '/etc/hadoop/conf')
 
@@ -47,33 +43,27 @@ def _get_resource_manager(hadoop_conf_path, rm_id=None):
     return rm_webapp_address or None
 
 
-def check_is_active_rm(url, timeout=30):
-    uri = Uri(url)
-    if uri.is_https:
-        conn = HTTPSConnection(host=uri.hostname, port=uri.port, timeout=timeout)
-    else:
-        conn = HTTPConnection(host=uri.hostname, port=uri.port, timeout=timeout)
+def check_is_active_rm(url, timeout=30, auth=None, verify=True):
     try:
-        conn.request('GET', '/cluster')
+        response = requests.get(url + "/cluster", timeout=timeout, auth=auth, verify=verify)
     except:
         return False
-    response = conn.getresponse()
-    if response.status != OK:
+
+    if response.status_code != 200:
+        print("Error to access RM - HTTP Code {}".format(response.status_code))
         return False
     else:
-        if response.getheader('Refresh', None) is not None:
-            return False
-    return True
+        return True
 
 
-def get_resource_manager_endpoint(timeout=30):
+def get_resource_manager_endpoint(timeout=30, auth=None, verify=True):
     hadoop_conf_path = CONF_DIR
     rm_ids = _get_rm_ids(hadoop_conf_path)
     if rm_ids:
         for rm_id in rm_ids:
             ret = _get_resource_manager(hadoop_conf_path, rm_id)
             if ret:
-                if check_is_active_rm(ret, timeout):
+                if check_is_active_rm(ret, timeout, auth, verify):
                     return ret
         return None
     else:
@@ -92,11 +82,11 @@ def get_nodemanager_endpoint():
     return parse(config_path, prop_name)
 
 
-def get_webproxy_endpoint(timeout=30):
+def get_webproxy_endpoint(timeout=30, auth=None, verify=True):
     config_path = os.path.join(CONF_DIR, 'yarn-site.xml')
     prop_name = 'yarn.web-proxy.address'
     value = parse(config_path, prop_name)
-    return value or get_resource_manager_endpoint(timeout)
+    return value or get_resource_manager_endpoint(timeout, auth, verify)
 
 
 def parse(config_path, key):

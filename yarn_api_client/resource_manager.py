@@ -74,10 +74,10 @@ class ResourceManager(BaseYarnAPI):
         active_service_endpoint = None
         if not service_endpoints:
             self.logger.debug('Get configuration from hadoop conf dir: {conf_dir}'.format(conf_dir=CONF_DIR))
-            active_service_endpoint = get_resource_manager_endpoint(timeout)
+            active_service_endpoint = get_resource_manager_endpoint(timeout, auth, verify)
         else:
             for endpoint in service_endpoints:
-                if check_is_active_rm(endpoint, timeout):
+                if check_is_active_rm(endpoint, timeout, auth, verify):
                     active_service_endpoint = endpoint
                     break
 
