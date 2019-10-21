@@ -5,11 +5,11 @@ Python client for Apache Hadoop® YARN API
 [![Latest
 Version](https://img.shields.io/pypi/v/yarn-api-client.svg)](https://pypi.python.org/pypi/yarn-api-client/) [![Travis CI build
 status](https://travis-ci.org/toidi/hadoop-yarn-api-python-client.svg?branch=master)](https://travis-ci.org/toidi/hadoop-yarn-api-python-client) [![Latest documentation
-status](http://readthedocs.org/projects/python-client-for-hadoop-yarn-api/badge/?version=latest)](https://python-client-for-hadoop-yarn-api.readthedocs.org/en/latest/?badge=latest) [![Test
+status](https://readthedocs.org/projects/yarn-api-client-python/badge/?version=latest)](https://yarn-api-client-python.readthedocs.org/en/latest/?badge=latest) [![Test
 coverage](https://coveralls.io/repos/toidi/hadoop-yarn-api-python-client/badge.png)](https://coveralls.io/r/toidi/hadoop-yarn-api-python-client)
 
 Package documentation:
-[python-client-for-hadoop-yarn-api.readthedocs.org](http://python-client-for-hadoop-yarn-api.readthedocs.org/en/latest/)
+[yarn-api-client-python.readthedocs.org](https://yarn-api-client-python.readthedocs.org/en/latest/)
 
 REST API documentation: [hadoop.apache.org](http://hadoop.apache.org/docs/stable/hadoop-yarn/hadoop-yarn-site/WebServicesIntro.html)
 
