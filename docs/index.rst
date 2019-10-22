@@ -9,12 +9,13 @@ Welcome to yarn-api-client's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 2
 
- resource_manager
- node_manager
- application_master
- history_server
+    base
+    resource_manager
+    node_manager
+    application_master
+    history_server
 
 
 Indices and tables
