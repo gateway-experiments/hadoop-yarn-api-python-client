@@ -13,7 +13,13 @@ except ImportError:
 
 
 class Response(object):
+    """
+    Basic container for response dictionary
+
+    :param requests.Response response: Response for call via requests lib
+    """
     def __init__(self, response):
+        #: Dictionary with response data
         self.data = response.json()
 
 

@@ -30,8 +30,8 @@ class NodeManager(BaseYarnAPI):
     :param int timeout: API connection timeout in seconds
     :param AuthBase auth: Auth to use for requests
     :param boolean verify: Either a boolean, in which case it controls whether
-    we verify the server's TLS certificate, or a string, in which case it must
-    be a path to a CA bundle to use. Defaults to ``True``
+        we verify the server's TLS certificate, or a string, in which case it must
+        be a path to a CA bundle to use. Defaults to ``True``
     """
     def __init__(self, service_endpoint=None, timeout=30, auth=None, verify=True):
         if not service_endpoint:

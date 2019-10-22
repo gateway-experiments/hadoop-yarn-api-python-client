@@ -63,12 +63,12 @@ class ResourceManager(BaseYarnAPI):
     be used.
 
     :param List[str] service_endpoints: List of ResourceManager HTTP(S)
-    addresses
+        addresses
     :param int timeout: API connection timeout in seconds
     :param AuthBase auth: Auth to use for requests configurations
     :param boolean verify: Either a boolean, in which case it controls whether
-    we verify the server's TLS certificate, or a string, in which case it must
-    be a path to a CA bundle to use. Defaults to ``True``
+        we verify the server's TLS certificate, or a string, in which case it must
+        be a path to a CA bundle to use. Defaults to ``True``
     """
     def __init__(self, service_endpoints=None, timeout=30, auth=None, verify=True):
         active_service_endpoint = None
@@ -305,8 +305,8 @@ class ResourceManager(BaseYarnAPI):
 
     def cluster_application_state(self, application_id):
         """
-        * This feature is currently in the alpha stage and may change in the
-        future *
+        (This feature is currently in the alpha stage and may change in the
+        future)
 
         With the application state API, you can obtain the current
         state of an application.
@@ -322,8 +322,8 @@ class ResourceManager(BaseYarnAPI):
 
     def cluster_application_kill(self, application_id):
         """
-        * This feature is currently in the alpha stage and may change in the
-        future *
+        (This feature is currently in the alpha stage and may change in the
+        future)
 
         With the application kill API, you can kill an application
         that is not in FINISHED or FAILED state.
@@ -377,8 +377,8 @@ class ResourceManager(BaseYarnAPI):
 
     def cluster_submit_application(self, data):
         """
-        * This feature is currently in the alpha stage and may change in the
-        future *
+        (This feature is currently in the alpha stage and may change in the
+        future)
 
         With the New Application API, you can obtain an application-id which
         can then be used as part of the Cluster Submit Applications API to
@@ -398,8 +398,8 @@ class ResourceManager(BaseYarnAPI):
 
     def cluster_new_application(self):
         """
-        * This feature is currently in the alpha stage and may change in the
-        future *
+        (This feature is currently in the alpha stage and may change in the
+        future)
 
         With the New Application API, you can obtain an application-id which
         can then be used as part of the Cluster Submit Applications API to
@@ -415,8 +415,8 @@ class ResourceManager(BaseYarnAPI):
 
     def cluster_get_application_queue(self, application_id):
         """
-        * This feature is currently in the alpha stage and may change in the
-        future *
+        (This feature is currently in the alpha stage and may change in the
+        future)
 
         With the application queue API, you can query the queue of a
         submitted app
@@ -431,8 +431,8 @@ class ResourceManager(BaseYarnAPI):
 
     def cluster_change_application_queue(self, application_id, queue):
         """
-        * This feature is currently in the alpha stage and may change in the
-        future *
+        (This feature is currently in the alpha stage and may change in the
+        future)
 
         Move a running app to another queue using a PUT request specifying the
         target queue.
@@ -458,8 +458,8 @@ class ResourceManager(BaseYarnAPI):
 
     def cluster_get_application_priority(self, application_id):
         """
-        * This feature is currently in the alpha stage and may change in the
-        future *
+        (This feature is currently in the alpha stage and may change in the
+        future)
 
         With the application priority API, you can query the priority of a
         submitted app
@@ -474,8 +474,8 @@ class ResourceManager(BaseYarnAPI):
 
     def cluster_change_application_priority(self, application_id, priority):
         """
-        * This feature is currently in the alpha stage and may change in the
-        future *
+        (This feature is currently in the alpha stage and may change in the
+        future)
 
         Update priority of a running or accepted app using a PUT request
         specifying the target priority.
@@ -584,7 +584,7 @@ class ResourceManager(BaseYarnAPI):
             unspecified or invalid, this will default to 0.
         :param str end_time: reservations that start after this end-time will be listed. If
             unspecified or invalid, this will default to Long.MaxValue.
-        :param str include_resource_allocations : true or false. If true, the resource allocations
+        :param str include_resource_allocations: true or false. If true, the resource allocations
             of the reservation will be included in the response. If false, no resource allocations
             will be included in the response. This will default to false.
         :returns: API response object with JSON data
@@ -606,8 +606,8 @@ class ResourceManager(BaseYarnAPI):
 
     def cluster_new_delegation_token(self, renewer):
         """
-        * This feature is currently in the alpha stage and may change in the
-        future *
+        (This feature is currently in the alpha stage and may change in the
+        future)
 
         API to create delegation token.
 
@@ -627,8 +627,8 @@ class ResourceManager(BaseYarnAPI):
 
     def cluster_renew_delegation_token(self, delegation_token):
         """
-        * This feature is currently in the alpha stage and may change in the
-        future *
+        (This feature is currently in the alpha stage and may change in the
+        future)
 
         API to renew delegation token.
 
@@ -650,8 +650,8 @@ class ResourceManager(BaseYarnAPI):
 
     def cluster_cancel_delegation_token(self, delegation_token):
         """
-        * This feature is currently in the alpha stage and may change in the
-        future *
+        (This feature is currently in the alpha stage and may change in the
+        future)
 
         API to cancel delegation token.
 
@@ -671,8 +671,8 @@ class ResourceManager(BaseYarnAPI):
 
     def cluster_new_reservation(self):
         """
-        * This feature is currently in the alpha stage and may change in the
-        future *
+        (This feature is currently in the alpha stage and may change in the
+        future)
 
         Use the New Reservation API, to obtain a reservation-id which can then be used as part of
         the Cluster Reservation API Submit to submit reservations.
@@ -764,7 +764,7 @@ class ResourceManager(BaseYarnAPI):
         The Cluster Application Timeout resource contains information about timeout.
 
         :param str application_id: The application id
-        :param str timeout_type:Timeout type. Valid values are the members of the
+        :param str timeout_type: Timeout type. Valid values are the members of the
             ApplicationTimeoutType enum. LIFETIME is currently the only valid value. .
         :returns: API response object with JSON data
         :rtype: :py:class:`yarn_api_client.base.Response`
@@ -794,8 +794,8 @@ class ResourceManager(BaseYarnAPI):
 
     def cluster_scheduler_conf_mutation(self):
         """
-        * This feature is currently in the alpha stage and may change in the
-        future *
+        (This feature is currently in the alpha stage and may change in the
+        future)
 
         API to retrieve the scheduler’s configuration that is currently loaded into
         scheduler’s context.
@@ -809,8 +809,8 @@ class ResourceManager(BaseYarnAPI):
 
     def cluster_modify_scheduler_conf_mutation(self, data):
         """
-        * This feature is currently in the alpha stage and may change in the
-        future *
+        (This feature is currently in the alpha stage and may change in the
+        future)
 
         API to modify the scheduler configuration
 
