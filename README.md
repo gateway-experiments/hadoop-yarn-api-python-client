@@ -86,6 +86,11 @@ app_information = am.application_information('application_id')
 
 ### Changelog
 
+1.0.1 Release
+   - Passes the authorization instance to the Active RM check
+   - Establishes a new (working) documentation site in readthedocs.io: yarn-api-client-python.readthedocs.io
+   - Adds more python version (3.7 and 3.8) to test matrix and removes 2.6.
+
 1.0.0 Release
    - Major cleanup of API.  
      - Address/port parameters have been replaced with complete 
