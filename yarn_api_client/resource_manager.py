@@ -518,7 +518,8 @@ class ResourceManager(BaseYarnAPI):
         tries to locate the queue using breadth-first-search algorithm.
 
         :param str yarn_queue_name: case sensitive queue name
-        :return: queue Dictionary, None if not found
+        :return: queue, None if not found
+        :rtype: dict
         """
         scheduler = self.cluster_scheduler().data
         scheduler_info = scheduler['scheduler']['schedulerInfo']
@@ -555,10 +556,12 @@ class ResourceManager(BaseYarnAPI):
         """
         A queue can be divided into multiple partitions having different node labels.
         Given the candidate queue and parition node label, this extracts the partition
-        we are interested in
+        we are interested in.
+
         :param dict candidate_queue: queue dictionary
         :param str cluster_node_label: case sensitive node label name
-        :return: partition Dict, None if not Found.
+        :return: partition, None if not Found.
+        :rtype: dict
         """
         for partition in candidate_queue['capacities']['queueCapacitiesByPartition']:
             if partition['partitionName'] == cluster_node_label:

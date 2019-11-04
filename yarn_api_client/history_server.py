@@ -103,6 +103,10 @@ class HistoryServer(BaseYarnAPI):
         """
         With the job attempts API, you can obtain a collection of resources
         that represent a job attempt.
+
+        :param str job_id: The job id
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
         """
         path = '/ws/v1/history/mapreduce/jobs/{jobid}/jobattempts'.format(
             jobid=job_id)
