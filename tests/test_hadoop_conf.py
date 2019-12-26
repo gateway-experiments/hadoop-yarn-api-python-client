@@ -3,6 +3,7 @@ from tempfile import NamedTemporaryFile
 
 import mock
 from mock import patch
+from requests import RequestException
 from tests import TestCase
 
 import requests_mock
@@ -171,10 +172,8 @@ class HadoopConfTestCase(TestCase):
 
         # Emulate requests library exception (socket timeout, etc)
         with requests_mock.mock() as requests_get_mock:
-            requests_get_mock.side_effect = Exception('error')
-            # requests_get_mock.get('https://example2:8022/cluster', status_code=200)
-            requests_get_mock.return_value = None
-            self.assertFalse(hadoop_conf.check_is_active_rm('https://example2:8022'))
+            requests_get_mock.get('example2:8022/cluster', exc=RequestException)
+            self.assertFalse(hadoop_conf.check_is_active_rm('example2:8022'))
 
     def test_get_resource_manager(self):
         with patch('yarn_api_client.hadoop_conf.parse') as parse_mock:
