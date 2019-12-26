@@ -104,7 +104,7 @@ class HadoopConfTestCase(TestCase):
 
                 endpoint = hadoop_conf.get_resource_manager_endpoint()
 
-                self.assertEqual('example.com:8022', endpoint)
+                self.assertEqual('http://example.com:8022', endpoint)
                 parse_mock.assert_called_with(hadoop_conf_path + 'yarn-site.xml',
                                               'yarn.resourcemanager.webapp.address')
 
@@ -123,7 +123,7 @@ class HadoopConfTestCase(TestCase):
         check_is_active_rm_mock.return_value = True
         endpoint = hadoop_conf.get_resource_manager_endpoint()
 
-        self.assertEqual('example.com:8022', endpoint)
+        self.assertEqual('http://example.com:8022', endpoint)
         parse_mock.assert_called_with(hadoop_conf_path + 'yarn-site.xml',
                                       'yarn.resourcemanager.webapp.address.rm1')
 
@@ -181,12 +181,12 @@ class HadoopConfTestCase(TestCase):
 
             endpoint = hadoop_conf._get_resource_manager(hadoop_conf.CONF_DIR, None)
 
-            self.assertEqual('example.com:8022', endpoint)
+            self.assertEqual('http://example.com:8022', endpoint)
             parse_mock.assert_called_with(hadoop_conf_path + 'yarn-site.xml', 'yarn.resourcemanager.webapp.address')
 
             endpoint = hadoop_conf._get_resource_manager(hadoop_conf.CONF_DIR, 'rm1')
 
-            self.assertEqual(('example.com:8022'), endpoint)
+            self.assertEqual(('http://example.com:8022'), endpoint)
             parse_mock.assert_called_with(hadoop_conf_path + 'yarn-site.xml', 'yarn.resourcemanager.webapp.address.rm1')
 
             parse_mock.reset_mock()
