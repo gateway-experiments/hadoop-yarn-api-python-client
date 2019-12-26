@@ -82,3 +82,4 @@ class ResourceManagerTestCase(TestCase):
             running_nodes = self.resource_manager.cluster_nodes(state='RUNNING', healthy='true')
             pprint(running_nodes.data)
             self.assertIsNotNone(nodes.data['nodes'])
+ 
