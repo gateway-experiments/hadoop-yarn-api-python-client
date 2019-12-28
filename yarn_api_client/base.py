@@ -25,6 +25,9 @@ class Response(object):
 
 class Uri(object):
     def __init__(self, service_endpoint):
+        if not (service_endpoint.startswith("http") and service_endpoint.startswith("https")):
+            service_endpoint = "http://" + service_endpoint
+
         service_uri = urlparse(service_endpoint)
         self.scheme = service_uri.scheme or 'http'
         self.hostname = service_uri.hostname or service_uri.path
