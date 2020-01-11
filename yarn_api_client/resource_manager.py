@@ -337,7 +337,7 @@ class ResourceManager(BaseYarnAPI):
         path = '/ws/v1/cluster/apps/{appid}/state'.format(
             appid=application_id)
 
-        return self.request(path, 'PUT', data=data)
+        return self.request(path, 'PUT', json=data)
 
     def cluster_nodes(self, states=None):
         """
