@@ -15,7 +15,7 @@ class ResourceManagerTestCase(TestCase):
 
     @patch('yarn_api_client.resource_manager.get_resource_manager_endpoint')
     def test__init__(self, get_config_mock, request_mock):
-        get_config_mock.return_value = "https:localhost"
+        get_config_mock.return_value = "https://localhost"
         rm = ResourceManager()
         get_config_mock.assert_called_with(30, None, True)
         self.assertEqual(rm.service_uri.is_https, True)
