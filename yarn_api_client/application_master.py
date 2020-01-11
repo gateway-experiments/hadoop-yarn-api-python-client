@@ -235,7 +235,7 @@ class ApplicationMaster(BaseYarnAPI):
             appid=application_id, jobid=job_id, taskid=task_id,
             attemptid=attempt_id)
 
-        return self.request(path, 'PUT', data=data)
+        return self.request(path, 'PUT', json=data)
 
     def task_attempt_counters(self, application_id, job_id, task_id, attempt_id):
         """
