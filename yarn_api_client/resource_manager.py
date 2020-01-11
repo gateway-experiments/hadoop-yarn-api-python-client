@@ -394,7 +394,7 @@ class ResourceManager(BaseYarnAPI):
         """
         path = '/ws/v1/cluster/apps'
 
-        return self.request(path, 'POST', data=data)
+        return self.request(path, 'POST', json=data)
 
     def cluster_new_application(self):
         """
@@ -454,7 +454,7 @@ class ResourceManager(BaseYarnAPI):
         """
         path = '/ws/v1/cluster/apps/{appid}/queue'.format(appid=application_id)
 
-        return self.request(path, 'PUT', data={"queue": queue})
+        return self.request(path, 'PUT', json={"queue": queue})
 
     def cluster_get_application_priority(self, application_id):
         """
@@ -497,7 +497,7 @@ class ResourceManager(BaseYarnAPI):
         """
         path = '/ws/v1/cluster/apps/{appid}/priority'.format(appid=application_id)
 
-        return self.request(path, 'PUT', data={"priority": priority})
+        return self.request(path, 'PUT', json={"priority": priority})
 
     def cluster_node_container_memory(self):
         """
@@ -626,7 +626,7 @@ class ResourceManager(BaseYarnAPI):
         """
         path = '/ws/v1/cluster/delegation-token'
 
-        return self.request(path, 'POST', data={"renewer": renewer})
+        return self.request(path, 'POST', json={"renewer": renewer})
 
     def cluster_renew_delegation_token(self, delegation_token):
         """
@@ -708,7 +708,7 @@ class ResourceManager(BaseYarnAPI):
         """
         path = '/ws/v1/cluster/reservation/submit'
 
-        return self.request(path, 'POST', data=data)
+        return self.request(path, 'POST', json=data)
 
     def cluster_update_reservation(self, data):
         """
@@ -727,7 +727,7 @@ class ResourceManager(BaseYarnAPI):
         """
         path = '/ws/v1/cluster/reservation/update'
 
-        return self.request(path, 'POST', data=data)
+        return self.request(path, 'POST', json=data)
 
     def cluster_delete_reservation(self, reservation_id):
         """
@@ -744,7 +744,7 @@ class ResourceManager(BaseYarnAPI):
         """
         path = '/ws/v1/cluster/reservation/delete'
 
-        return self.request(path, 'POST', data={'reservation-id': reservation_id})
+        return self.request(path, 'POST', json={'reservation-id': reservation_id})
 
     def cluster_application_timeouts(self, application_id):
         """
@@ -791,7 +791,7 @@ class ResourceManager(BaseYarnAPI):
         """
         path = '/ws/v1/cluster/apps/{appid}/timeout'.format(appid=application_id)
 
-        return self.request(path, 'PUT', data={
+        return self.request(path, 'PUT', json={
             "timeout": {"type": timeout_type, "expiryTime": expiry_time}
         })
 
@@ -826,4 +826,4 @@ class ResourceManager(BaseYarnAPI):
         """
         path = '/ws/v1/cluster/scheduler-conf'
 
-        return self.request(path, 'PUT', data=data)
+        return self.request(path, 'PUT', json=data)
