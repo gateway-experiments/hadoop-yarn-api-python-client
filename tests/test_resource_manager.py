@@ -97,7 +97,7 @@ class ResourceManagerTestCase(TestCase):
 
     def test_cluster_application_kill(self, request_mock):
         self.rm.cluster_application_kill('app_1')
-        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/state', 'PUT', data={
+        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/state', 'PUT', json={
             "state": 'KILLED'
         })
 
