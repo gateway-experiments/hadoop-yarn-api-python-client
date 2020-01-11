@@ -97,7 +97,7 @@ class ResourceManagerTestCase(TestCase):
 
     def test_cluster_application_kill(self, request_mock):
         self.rm.cluster_application_kill('app_1')
-        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/state', 'PUT', data={
+        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/state', 'PUT', json={
             "state": 'KILLED'
         })
 
@@ -119,7 +119,7 @@ class ResourceManagerTestCase(TestCase):
 
     def test_cluster_submit_application(self, request_mock):
         self.rm.cluster_submit_application({"application-name": "dummy_application"})
-        request_mock.assert_called_with('/ws/v1/cluster/apps', 'POST', data={
+        request_mock.assert_called_with('/ws/v1/cluster/apps', 'POST', json={
             "application-name": "dummy_application"
         })
 
@@ -133,7 +133,7 @@ class ResourceManagerTestCase(TestCase):
 
     def test_cluster_change_application_queue(self, request_mock):
         self.rm.cluster_change_application_queue('app_1', 'queue_1')
-        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/queue', 'PUT', data={
+        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/queue', 'PUT', json={
             "queue": 'queue_1'
         })
 
@@ -143,7 +143,7 @@ class ResourceManagerTestCase(TestCase):
 
     def test_cluster_change_application_priority(self, request_mock):
         self.rm.cluster_change_application_priority('app_1', 'priority_1')
-        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/priority', 'PUT', data={
+        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/priority', 'PUT', json={
             "priority": 'priority_1'
         })
 
@@ -260,7 +260,7 @@ class ResourceManagerTestCase(TestCase):
 
     def test_cluster_new_delegation_token(self, request_mock):
         self.rm.cluster_new_delegation_token('renewer_1')
-        request_mock.assert_called_with('/ws/v1/cluster/delegation-token', 'POST', data={
+        request_mock.assert_called_with('/ws/v1/cluster/delegation-token', 'POST', json={
             "renewer": "renewer_1"
         })
 
@@ -282,7 +282,7 @@ class ResourceManagerTestCase(TestCase):
 
     def test_cluster_submit_reservation(self, request_mock):
         self.rm.cluster_submit_reservation({'reservation-id': 'reservation_1'})
-        request_mock.assert_called_with('/ws/v1/cluster/reservation/submit', 'POST', data={
+        request_mock.assert_called_with('/ws/v1/cluster/reservation/submit', 'POST', json={
             'reservation-id': 'reservation_1'
         })
 
@@ -290,13 +290,13 @@ class ResourceManagerTestCase(TestCase):
         self.rm.cluster_update_reservation({
             'reservation-id': 'reservation_1'
         })
-        request_mock.assert_called_with('/ws/v1/cluster/reservation/update', 'POST', data={
+        request_mock.assert_called_with('/ws/v1/cluster/reservation/update', 'POST', json={
             'reservation-id': 'reservation_1'
         })
 
     def test_cluster_delete_reservation(self, request_mock):
         self.rm.cluster_delete_reservation('reservation_1')
-        request_mock.assert_called_with('/ws/v1/cluster/reservation/delete', 'POST', data={
+        request_mock.assert_called_with('/ws/v1/cluster/reservation/delete', 'POST', json={
             'reservation-id': 'reservation_1'
         })
 
@@ -310,7 +310,7 @@ class ResourceManagerTestCase(TestCase):
 
     def test_cluster_update_application_timeout(self, request_mock):
         self.rm.cluster_update_application_timeout('app_1', 'LIFETIME', '2016-12-05T22:51:00.104+0530')
-        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/timeout', 'PUT', data={
+        request_mock.assert_called_with('/ws/v1/cluster/apps/app_1/timeout', 'PUT', json={
             'timeout': {'type': 'LIFETIME', 'expiryTime': '2016-12-05T22:51:00.104+0530'}
         })
 
@@ -325,7 +325,7 @@ class ResourceManagerTestCase(TestCase):
                 'test': 'test'
             }
         })
-        request_mock.assert_called_with('/ws/v1/cluster/scheduler-conf', 'PUT', data={
+        request_mock.assert_called_with('/ws/v1/cluster/scheduler-conf', 'PUT', json={
             'queue-name': 'queue_1',
             'params': {
                 'test': 'test'
