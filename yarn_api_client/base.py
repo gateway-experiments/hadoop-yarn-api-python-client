@@ -19,8 +19,12 @@ class Response(object):
     :param requests.Response response: Response for call via requests lib
     """
     def __init__(self, response):
-        #: Dictionary with response data
-        self.data = response.json()
+        #: Dictionary with response data.  Handle cases where content is empty
+        # to prevent JSON decode issues
+        if response.content:
+            self.data = response.json()
+        else:
+            self.data = {}
 
 
 class Uri(object):
