@@ -86,6 +86,13 @@ app_information = am.application_information('application_id')
 
 ### Changelog
 
+1.0.2 Release
+   - Add support for Python 3.8.x
+   - Fix HTTPS url parsing
+   - Fix JSON body request APIs
+   - Handle YARN response with empty contents
+   - Better logging support
+
 1.0.1 Release
    - Passes the authorization instance to the Active RM check
    - Establishes a new (working) documentation site in readthedocs.io: yarn-api-client-python.readthedocs.io
@@ -93,9 +100,9 @@ app_information = am.application_information('application_id')
 
 1.0.0 Release
    - Major cleanup of API.  
-     - Address/port parameters have been replaced with complete 
-       endpoints (includes scheme [e.g., http or https]). 
-     - ResourceManager has been updated to take a list of endpoints for 
+     - Address/port parameters have been replaced with complete
+       endpoints (includes scheme [e.g., http or https]).
+     - ResourceManager has been updated to take a list of endpoints for
        improved HA support.
      - ResourceManager, ApplicationMaster, HistoryServer and NodeManager
        have been updated with methods corresponding to the latest REST API.
@@ -107,7 +114,7 @@ app_information = am.application_information('application_id')
    to update to 1.0 as soon as possible.
 
 0.3.7 Release  
-   - Honor configured HTTP Policy when no address is provided - enabling 
+   - Honor configured HTTP Policy when no address is provided - enabling
      using of HTTPS in these cases.
 
 0.3.6 Release  
