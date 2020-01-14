@@ -2,7 +2,10 @@
 from __future__ import unicode_literals
 
 import logging
+import os
 import requests
+
+from datetime import datetime
 
 from .errors import APIError, ConfigurationError
 
@@ -10,6 +13,14 @@ try:
     from urlparse import urlparse, urlunparse
 except ImportError:
     from urllib.parse import urlparse, urlunparse
+
+
+def get_logger(logger_name):
+    logger = logging.getLogger(logger_name)
+    return logger
+
+
+log = get_logger(__name__)
 
 
 class Response(object):
@@ -49,7 +60,6 @@ class Uri(object):
 
 
 class BaseYarnAPI(object):
-    __logger = None
     response_class = Response
 
     def __init__(self, service_endpoint=None, timeout=None, auth=None, verify=True):
@@ -72,8 +82,6 @@ class BaseYarnAPI(object):
         self._validate_configuration()
         api_endpoint = self.service_uri.to_url(api_path)
 
-        self.logger.info('API Endpoint {}'.format(api_endpoint))
-
         if method == 'GET':
             headers = {}
         else:
@@ -82,20 +90,26 @@ class BaseYarnAPI(object):
         if 'headers' in kwargs and kwargs['headers']:
             headers.update(kwargs['headers'])
 
+        begin = datetime.now()
         response = self.session.request(method=method, url=api_endpoint, headers=headers, timeout=self.timeout, **kwargs)
+        end = datetime.now()
+        log.debug(
+            "'{method}' request against endpoint '{endpoint}' took {duration} ms".format(
+                method=method, 
+                endpoint=api_endpoint,
+                duration=round((end-begin).total_seconds()*1000,3)
+            )
+        )
 
         if response.status_code in (200, 202):
             return self.response_class(response)
         else:
-            msg = 'Response finished with status: %s. Details: %s' % (response.status_code, response.text)
+            msg = "Response finished with status: {status}. Details: {msg}".format(
+                status=response.status_code, 
+                msg=response.text
+            )
             raise APIError(msg)
 
     def construct_parameters(self, arguments):
         params = dict((key, value) for key, value in arguments if value is not None)
         return params
-
-    @property
-    def logger(self):
-        if self.__logger is None:
-            self.__logger = logging.getLogger(self.__module__)
-        return self.__logger
