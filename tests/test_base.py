@@ -70,13 +70,12 @@ class BaseYarnAPITestCase(TestCase):
         self.assertEqual(result_uri.hostname, '123.45.67.89')
         self.assertEqual(result_uri.port, 1234)
         self.assertEqual(result_uri.is_https, False)
-        
+
         result_uri = base.Uri('https://test-domain.com:1234')
         self.assertEqual(result_uri.scheme, 'https')
         self.assertEqual(result_uri.hostname, 'test-domain.com')
         self.assertEqual(result_uri.port, 1234)
         self.assertEqual(result_uri.is_https, True)
-        
 
     def get_client(self):
         client = base.BaseYarnAPI()

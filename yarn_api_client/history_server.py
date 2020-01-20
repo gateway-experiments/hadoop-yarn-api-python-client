@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from .base import BaseYarnAPI
+
+from .base import BaseYarnAPI, get_logger
 from .constants import JobStateInternal
 from .errors import IllegalArgumentError
 from .hadoop_conf import get_jobhistory_endpoint
+
+log = get_logger(__name__)
 
 
 class HistoryServer(BaseYarnAPI):
@@ -24,7 +27,6 @@ class HistoryServer(BaseYarnAPI):
     """
     def __init__(self, service_endpoint=None, timeout=30, auth=None, verify=True):
         if not service_endpoint:
-            self.logger.debug('Get information from hadoop conf dir')
             service_endpoint = get_jobhistory_endpoint()
 
         super(HistoryServer, self).__init__(service_endpoint, timeout, auth, verify)
