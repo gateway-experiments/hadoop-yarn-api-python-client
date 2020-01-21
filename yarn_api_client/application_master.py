@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from .base import BaseYarnAPI
+
+from .base import BaseYarnAPI, get_logger
 from .hadoop_conf import get_webproxy_endpoint
+
+
+log = get_logger(__name__)
 
 
 class ApplicationMaster(BaseYarnAPI):
@@ -24,7 +28,6 @@ class ApplicationMaster(BaseYarnAPI):
     """
     def __init__(self, service_endpoint=None, timeout=30, auth=None, verify=True):
         if not service_endpoint:
-            self.logger.debug('Get configuration from hadoop conf dir')
             service_endpoint = get_webproxy_endpoint(timeout, auth, verify)
 
         super(ApplicationMaster, self).__init__(service_endpoint, timeout, auth, verify)
@@ -235,7 +238,7 @@ class ApplicationMaster(BaseYarnAPI):
             appid=application_id, jobid=job_id, taskid=task_id,
             attemptid=attempt_id)
 
-        return self.request(path, 'PUT', data=data)
+        return self.request(path, 'PUT', json=data)
 
     def task_attempt_counters(self, application_id, job_id, task_id, attempt_id):
         """

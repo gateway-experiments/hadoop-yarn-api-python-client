@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import argparse
-import logging
 from pprint import pprint
-import sys
 
+from .base import get_logger
 from .constants import (YarnApplicationState, FinalApplicationStatus,
                         ApplicationState, JobStateInternal)
 from . import ResourceManager, NodeManager, HistoryServer, ApplicationMaster
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+log = get_logger(__name__)
 
 
 def get_parser():

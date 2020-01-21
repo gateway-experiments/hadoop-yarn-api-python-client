@@ -3,6 +3,10 @@ import os
 import xml.etree.ElementTree as ET
 import requests
 
+from .base import get_logger
+
+log = get_logger(__name__)
+
 CONF_DIR = os.getenv('HADOOP_CONF_DIR', '/etc/hadoop/conf')
 
 
@@ -14,7 +18,8 @@ def _get_rm_ids(hadoop_conf_path):
 
 
 def _get_maximum_container_memory(hadoop_conf_path):
-    container_memory = int(parse(os.path.join(hadoop_conf_path,'yarn-site.xml'), 'yarn.nodemanager.resource.memory-mb'))
+    container_memory = int(parse(os.path.join(hadoop_conf_path, 'yarn-site.xml'),
+                                 'yarn.nodemanager.resource.memory-mb'))
     return container_memory
 
 
@@ -49,17 +54,18 @@ def check_is_active_rm(url, timeout=30, auth=None, verify=True):
     try:
         response = requests.get(url + "/cluster", timeout=timeout, auth=auth, verify=verify)
     except requests.RequestException as e:
-        print("Error to access RM: {}".format(e))
+        log.warning("Exception encountered accessing RM '{url}': '{err}', continuing...".format(url=url, err=e))
         return False
 
     if response.status_code != 200:
-        print("Error to access RM - HTTP Code {}".format(response.status_code))
+        log.warning("Failed to access RM '{url}' - HTTP Code '{status}', continuing...".format(url=url, status=response.status_code))
         return False
     else:
         return True
 
 
 def get_resource_manager_endpoint(timeout=30, auth=None, verify=True):
+    log.info('Getting resource manager endpoint from config: {config_path}'.format(config_path=os.path.join(CONF_DIR, 'yarn-site.xml')))
     hadoop_conf_path = CONF_DIR
     rm_ids = _get_rm_ids(hadoop_conf_path)
     if rm_ids:
@@ -75,18 +81,21 @@ def get_resource_manager_endpoint(timeout=30, auth=None, verify=True):
 
 def get_jobhistory_endpoint():
     config_path = os.path.join(CONF_DIR, 'mapred-site.xml')
+    log.info('Getting jobhistory endpoint from config: {config_path}'.format(config_path=config_path))
     prop_name = 'mapreduce.jobhistory.webapp.address'
     return parse(config_path, prop_name)
 
 
 def get_nodemanager_endpoint():
     config_path = os.path.join(CONF_DIR, 'yarn-site.xml')
+    log.info('Getting nodemanager endpoint from config: {config_path}'.format(config_path=config_path))
     prop_name = 'yarn.nodemanager.webapp.address'
     return parse(config_path, prop_name)
 
 
 def get_webproxy_endpoint(timeout=30, auth=None, verify=True):
     config_path = os.path.join(CONF_DIR, 'yarn-site.xml')
+    log.info('Getting webproxy endpoint from config: {config_path}'.format(config_path=config_path))
     prop_name = 'yarn.web-proxy.address'
     value = parse(config_path, prop_name)
     return value or get_resource_manager_endpoint(timeout, auth, verify)

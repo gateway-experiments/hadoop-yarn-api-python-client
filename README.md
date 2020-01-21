@@ -2,11 +2,11 @@
 
 Python client for Apache Hadoop® YARN API
 
-[![Latest
-Version](https://img.shields.io/pypi/v/yarn-api-client.svg)](https://pypi.python.org/pypi/yarn-api-client/) [![Travis CI build
-status](https://travis-ci.org/toidi/hadoop-yarn-api-python-client.svg?branch=master)](https://travis-ci.org/toidi/hadoop-yarn-api-python-client) [![Latest documentation
-status](https://readthedocs.org/projects/yarn-api-client-python/badge/?version=latest)](https://yarn-api-client-python.readthedocs.org/en/latest/?badge=latest) [![Test
-coverage](https://coveralls.io/repos/toidi/hadoop-yarn-api-python-client/badge.png)](https://coveralls.io/r/toidi/hadoop-yarn-api-python-client)
+[![Latest Version](https://img.shields.io/pypi/v/yarn-api-client.svg)](https://pypi.python.org/pypi/yarn-api-client/)
+[![Downloads](https://pepy.tech/badge/yarn-api-client/month)](https://pepy.tech/project/yarn-api-client/month)
+[![Travis CI build status](https://travis-ci.org/toidi/hadoop-yarn-api-python-client.svg?branch=master)](https://travis-ci.org/toidi/hadoop-yarn-api-python-client)
+[![Latest documentation status](https://readthedocs.org/projects/yarn-api-client-python/badge/?version=latest)](https://yarn-api-client-python.readthedocs.org/en/latest/?badge=latest)
+[![Test coverage](https://coveralls.io/repos/toidi/hadoop-yarn-api-python-client/badge.png)](https://coveralls.io/r/toidi/hadoop-yarn-api-python-client)
 
 Package documentation:
 [yarn-api-client-python.readthedocs.org](https://yarn-api-client-python.readthedocs.org/en/latest/)

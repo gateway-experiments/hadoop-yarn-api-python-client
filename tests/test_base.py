@@ -52,6 +52,31 @@ class BaseYarnAPITestCase(TestCase):
             with self.assertRaises(ConfigurationError):
                 client.request('/ololo')
 
+    def test_uri_parsing(self):
+        result_uri = base.Uri('localhost')
+        self.assertEqual(result_uri.scheme, 'http')
+        self.assertEqual(result_uri.hostname, 'localhost')
+        self.assertEqual(result_uri.port, None)
+        self.assertEqual(result_uri.is_https, False)
+
+        result_uri = base.Uri('test-domain.com:1234')
+        self.assertEqual(result_uri.scheme, 'http')
+        self.assertEqual(result_uri.hostname, 'test-domain.com')
+        self.assertEqual(result_uri.port, 1234)
+        self.assertEqual(result_uri.is_https, False)
+
+        result_uri = base.Uri('http://123.45.67.89:1234')
+        self.assertEqual(result_uri.scheme, 'http')
+        self.assertEqual(result_uri.hostname, '123.45.67.89')
+        self.assertEqual(result_uri.port, 1234)
+        self.assertEqual(result_uri.is_https, False)
+
+        result_uri = base.Uri('https://test-domain.com:1234')
+        self.assertEqual(result_uri.scheme, 'https')
+        self.assertEqual(result_uri.hostname, 'test-domain.com')
+        self.assertEqual(result_uri.port, 1234)
+        self.assertEqual(result_uri.is_https, True)
+
     def get_client(self):
         client = base.BaseYarnAPI()
         client.service_uri = base.Uri('example.com:80')

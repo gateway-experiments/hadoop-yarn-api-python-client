@@ -67,7 +67,7 @@ class AppMasterTestCase(TestCase):
         self.app.task_attempt_state_kill('app_1', 'job_2', 'task_3', 'attempt_4')
         request_mock.assert_called_with(
             '/proxy/app_1/ws/v1/mapreduce/jobs/job_2/tasks/task_3/attempts/attempt_4/state',
-            'PUT', data={'state': 'KILLED'}
+            'PUT', json={'state': 'KILLED'}
         )
 
     def test_task_attempt_counters(self, request_mock):
