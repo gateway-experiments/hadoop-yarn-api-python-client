@@ -34,7 +34,9 @@ def _is_https_only():
 
 def _get_resource_manager(hadoop_conf_path, rm_id=None):
     # compose property name based on policy (and rm_id)
-    if _is_https_only():
+    is_https_only = _is_https_only()
+
+    if is_https_only:
         prop_name = 'yarn.resourcemanager.webapp.https.address'
     else:
         prop_name = 'yarn.resourcemanager.webapp.address'
@@ -43,15 +45,15 @@ def _get_resource_manager(hadoop_conf_path, rm_id=None):
     if rm_id:
         prop_name = "{name}.{rm_id}".format(name=prop_name, rm_id=rm_id)
 
-    rm_webapp_address = parse(os.path.join(hadoop_conf_path, 'yarn-site.xml'), prop_name)
+    rm_address = parse(os.path.join(hadoop_conf_path, 'yarn-site.xml'), prop_name)
 
-    return rm_webapp_address or None
+    return ('https://' if is_https_only else 'http://') + rm_address if rm_address else None
 
 
 def check_is_active_rm(url, timeout=30, auth=None, verify=True):
     try:
         response = requests.get(url + "/cluster", timeout=timeout, auth=auth, verify=verify)
-    except Exception as e:
+    except requests.RequestException as e:
         log.warning("Exception encountered accessing RM '{url}': '{err}', continuing...".format(url=url, err=e))
         return False
 

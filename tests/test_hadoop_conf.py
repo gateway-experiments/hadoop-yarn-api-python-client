@@ -3,6 +3,7 @@ from tempfile import NamedTemporaryFile
 
 import mock
 from mock import patch
+from requests import RequestException
 from tests import TestCase
 
 import requests_mock
@@ -103,7 +104,7 @@ class HadoopConfTestCase(TestCase):
 
                 endpoint = hadoop_conf.get_resource_manager_endpoint()
 
-                self.assertEqual('example.com:8022', endpoint)
+                self.assertEqual('http://example.com:8022', endpoint)
                 parse_mock.assert_called_with(hadoop_conf_path + 'yarn-site.xml',
                                               'yarn.resourcemanager.webapp.address')
 
@@ -122,7 +123,7 @@ class HadoopConfTestCase(TestCase):
         check_is_active_rm_mock.return_value = True
         endpoint = hadoop_conf.get_resource_manager_endpoint()
 
-        self.assertEqual('example.com:8022', endpoint)
+        self.assertEqual('http://example.com:8022', endpoint)
         parse_mock.assert_called_with(hadoop_conf_path + 'yarn-site.xml',
                                       'yarn.resourcemanager.webapp.address.rm1')
 
@@ -171,10 +172,8 @@ class HadoopConfTestCase(TestCase):
 
         # Emulate requests library exception (socket timeout, etc)
         with requests_mock.mock() as requests_get_mock:
-            requests_get_mock.side_effect = Exception('error')
-            # requests_get_mock.get('https://example2:8022/cluster', status_code=200)
-            requests_get_mock.return_value = None
-            self.assertFalse(hadoop_conf.check_is_active_rm('https://example2:8022'))
+            requests_get_mock.get('example2:8022/cluster', exc=RequestException)
+            self.assertFalse(hadoop_conf.check_is_active_rm('example2:8022'))
 
     def test_get_resource_manager(self):
         with patch('yarn_api_client.hadoop_conf.parse') as parse_mock:
@@ -182,12 +181,12 @@ class HadoopConfTestCase(TestCase):
 
             endpoint = hadoop_conf._get_resource_manager(hadoop_conf.CONF_DIR, None)
 
-            self.assertEqual('example.com:8022', endpoint)
+            self.assertEqual('http://example.com:8022', endpoint)
             parse_mock.assert_called_with(hadoop_conf_path + 'yarn-site.xml', 'yarn.resourcemanager.webapp.address')
 
             endpoint = hadoop_conf._get_resource_manager(hadoop_conf.CONF_DIR, 'rm1')
 
-            self.assertEqual(('example.com:8022'), endpoint)
+            self.assertEqual(('http://example.com:8022'), endpoint)
             parse_mock.assert_called_with(hadoop_conf_path + 'yarn-site.xml', 'yarn.resourcemanager.webapp.address.rm1')
 
             parse_mock.reset_mock()
