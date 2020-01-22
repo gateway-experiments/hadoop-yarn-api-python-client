@@ -142,3 +142,14 @@ app_information = am.application_information('application_id')
 
 0.2.4 Release  
   - Added compatibility with HA enabled Resource Manager
+
+### Team
+
+YARN API client is developed by an open community, and the current maintainers 
+are listed below in alphabetical order:
+
+- [Dmitry Romanenko](https://github.com/dimon222)
+- [Eduard Iskandarov](https://github.com/toidi)
+- [Kevin Bates](https://github.com/kevin-bates)
+- [Luciano Resende](https://github.com/lresende)
+
