@@ -244,10 +244,19 @@ def main():
     opts = parser.parse_args()
 
     class_kwargs = {}
+    endpoint = None
     if opts.host is not None:
-        class_kwargs['address'] = opts.host
-    if opts.port is not None:
-        class_kwargs['port'] = opts.port
+        endpoint = opts.host
+        if opts.port is not None:
+            endpoint += ":" + str(opts.port)
+
+    if not hasattr(opts, 'api_class'):
+        raise Exception("Please provide api class - rm, hs, nm, am")
+    # Only ResourceManager supports HA
+    elif opts.api_class == ResourceManager:
+        class_kwargs['service_endpoints'] = [endpoint]
+    else:
+        class_kwargs['service_endpoint'] = endpoint
 
     api = opts.api_class(**class_kwargs)
     # Construct positional arguments for method
