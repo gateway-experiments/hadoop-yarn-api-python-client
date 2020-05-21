@@ -6,13 +6,9 @@ import os
 import requests
 
 from datetime import datetime
+from urllib.parse import urlparse, urlunparse
 
 from .errors import APIError, ConfigurationError
-
-try:
-    from urlparse import urlparse, urlunparse
-except ImportError:
-    from urllib.parse import urlparse, urlunparse
 
 
 def get_logger(logger_name):

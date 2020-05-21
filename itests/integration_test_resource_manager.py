@@ -4,12 +4,8 @@ import os
 
 from pprint import pprint
 from unittest import TestCase
+from urllib.parse import urlparse
 from yarn_api_client.resource_manager import ResourceManager
-
-try:
-    from urlparse import urlparse
-except ImportError:
-    from urllib.parse import urlparse
 
 
 class ResourceManagerTestCase(TestCase):
