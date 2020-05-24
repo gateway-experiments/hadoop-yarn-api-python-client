@@ -15,8 +15,7 @@ def get_parser():
     parser = argparse.ArgumentParser(
         description='Client for Hadoop® YARN API')
 
-    parser.add_argument('--host', help='API host')
-    parser.add_argument('--port', help='API port')
+    parser.add_argument('--endpoint', help='API endpoint (https://test.cluster.com:8090)')
 
     subparsers = parser.add_subparsers()
     populate_resource_manager_arguments(subparsers)
@@ -244,10 +243,14 @@ def main():
     opts = parser.parse_args()
 
     class_kwargs = {}
-    if opts.host is not None:
-        class_kwargs['address'] = opts.host
-    if opts.port is not None:
-        class_kwargs['port'] = opts.port
+    if not hasattr(opts, 'api_class'):
+        raise Exception("Please provide api class - rm, hs, nm, am")
+    # Only ResourceManager supports HA
+    elif opts.endpoint:
+        if opts.api_class == ResourceManager:
+            class_kwargs['service_endpoints'] = opts.endpoint.split(",")
+        else:
+            class_kwargs['service_endpoint'] = opts.endpoint
 
     api = opts.api_class(**class_kwargs)
     # Construct positional arguments for method
