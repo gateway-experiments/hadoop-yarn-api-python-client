@@ -15,7 +15,7 @@ def get_parser():
     parser = argparse.ArgumentParser(
         description='Client for Hadoop® YARN API')
 
-    parser.add_argument('--endpoint', help='API endpoint (https://test.cluster.com:1234)')
+    parser.add_argument('--endpoint', help='API endpoint (https://test.cluster.com:8090)')
 
     subparsers = parser.add_subparsers()
     populate_resource_manager_arguments(subparsers)
