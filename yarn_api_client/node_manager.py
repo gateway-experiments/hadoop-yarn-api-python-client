@@ -114,3 +114,28 @@ class NodeManager(BaseYarnAPI):
             containerid=container_id)
 
         return self.request(path)
+
+    def auxiliary_services(self):
+        """
+        With the auxiliary services API, you can obtain a collection of resources,
+        each of which represents an auxiliary service. When you run a GET operation
+        on this resource, you obtain a collection of auxiliary service information objects.
+
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/node/auxiliaryservices'
+        return self.request(path)
+
+    def auxiliary_services_update(self, data):
+        """
+        A YARN admin can use a PUT operation to update the auxiliary services running
+        on the NodeManager. The body of the request should be of the same format as
+        an auxiliary services manifest file.
+
+        :param dict data: auxiliary services manifest file
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/node/auxiliaryservices'
+        return self.request(path, 'PUT', json=data)

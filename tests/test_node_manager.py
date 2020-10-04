@@ -37,3 +37,39 @@ class NodeManagerTestCase(TestCase):
     def test_node_container(self, request_mock):
         self.nm.node_container('container_1')
         request_mock.assert_called_with('/ws/v1/node/containers/container_1')
+
+    def test_auxiliary_services(self, request_mock):
+        self.nm.auxiliary_services()
+        request_mock.assert_called_with('/ws/v1/node/auxiliaryservices')
+
+    def test_auxiliary_services_update(self, request_mock):
+        self.nm.auxiliary_services_update({
+          "services": [
+            {
+              "name": "mapreduce_shuffle",
+              "version": "2",
+              "configuration": {
+                "properties": {
+                  "class.name": "org.apache.hadoop.mapred.ShuffleHandler",
+                  "mapreduce.shuffle.transfer.buffer.size": "102400",
+                  "mapreduce.shuffle.port": "13563"
+                }
+              }
+            }
+          ]
+        })
+        request_mock.assert_called_with('/ws/v1/node/auxiliaryservices', 'PUT', json={
+          "services": [
+            {
+              "name": "mapreduce_shuffle",
+              "version": "2",
+              "configuration": {
+                "properties": {
+                  "class.name": "org.apache.hadoop.mapred.ShuffleHandler",
+                  "mapreduce.shuffle.transfer.buffer.size": "102400",
+                  "mapreduce.shuffle.port": "13563"
+                }
+              }
+            }
+          ]
+        })
