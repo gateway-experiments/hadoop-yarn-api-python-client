@@ -34,10 +34,7 @@ conda install -c conda-forge yarn-api-client
 
 From source code
 ```
-git clone https://github.com/toidi/hadoop-yarn-api-python-client.git
-pushd hadoop-yarn-api-python-client
-python setup.py install
-popd
+pip install git+https://github.com/CODAIT/hadoop-yarn-api-python-client.git
 ```
 
 ## Enabling support for Kerberos/SPNEGO Security
