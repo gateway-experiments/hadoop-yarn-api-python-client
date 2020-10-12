@@ -4,8 +4,10 @@ language: python
 
 matrix:
   include:
-    - python: 3.8-dev
-      env: TOXENV=py38
+    - python: 3.9-dev
+      env: TOXENV=py39
+    - python: 3.9
+      env: TOXENV=py39
     - python: 3.8
       env: TOXENV=py38
     - python: 3.7
