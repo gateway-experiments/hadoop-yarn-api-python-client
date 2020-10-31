@@ -43,7 +43,8 @@ class ResourceManagerTestCase(TestCase):
                                      finished_time_begin=3, finished_time_end=4,
                                      application_types=['YARN'],
                                      application_tags=['apptag'],
-                                     de_selects=['resouceRequests'])
+                                     name="wordcount",
+                                     de_selects=['resourceRequests'])
         request_mock.assert_called_with('/ws/v1/cluster/apps', params={
             'state': 'KILLED',
             'states': 'KILLED',
@@ -57,7 +58,8 @@ class ResourceManagerTestCase(TestCase):
             'finishedTimeEnd': 4,
             'applicationTypes': 'YARN',
             'applicationTags': 'apptag',
-            'deSelects': 'resouceRequests'
+            'name': 'wordcount',
+            'deSelects': 'resourceRequests'
         })
 
         with self.assertRaises(IllegalArgumentError):
@@ -330,4 +332,51 @@ class ResourceManagerTestCase(TestCase):
             'params': {
                 'test': 'test'
             }
+        })
+
+    def test_cluster_node_update_resource(self, request_mock):
+        self.rm.cluster_node_update_resource('node_1', {
+          "resource":
+          {
+            "memory": 1024,
+            "vCores": 3
+          },
+          "overCommitTimeout": -1
+        })
+        request_mock.assert_called_with('/ws/v1/cluster/nodes/node_1/resource', 'POST', json={
+          "resource":
+          {
+            "memory": 1024,
+            "vCores": 3
+          },
+          "overCommitTimeout": -1
+        })
+
+    def test_cluster_container_signal(self, request_mock):
+        self.rm.cluster_container_signal('container_1', 'OUTPUT_THREAD_DUMP')
+        request_mock.assert_called_with(
+            '/ws/v1/cluster/containers/container_1/signal/OUTPUT_THREAD_DUMP',
+            'POST'
+        )
+
+    def test_scheduler_activities(self, request_mock):
+        self.rm.scheduler_activities(node_id='node_1', group_by='diagnostic')
+        request_mock.assert_called_with('/ws/v1/cluster/scheduler/activities', params={
+            "nodeId": 'node_1',
+            "groupBy": 'diagnostic'
+        })
+
+    def test_application_activities(self, request_mock):
+        self.rm.application_activities('app_1', max_time=4,
+                                       request_priorities=["1","2"],
+                                       allocation_request_ids=["-1", "1"], group_by="diagnostic",
+                                       limit=5, actions=['refresh', 'get'], summarize=True)
+        request_mock.assert_called_with('/ws/v1/cluster/scheduler/app-activities/app_1', params={
+            "maxTime": 4,
+            "requestPriorities": "1,2",
+            "allocationRequestIds": "-1,1",
+            "groupBy": "diagnostic",
+            "limit": 5,
+            "actions": "refresh,get",
+            "summarize": True
         })
