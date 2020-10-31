@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from .base import BaseYarnAPI, get_logger
-from .constants import YarnApplicationState, FinalApplicationStatus
+from .constants import YarnApplicationState, FinalApplicationStatus, ClusterContainerSignal
 from .errors import IllegalArgumentError
 from .hadoop_conf import get_resource_manager_endpoint, check_is_active_rm, CONF_DIR, _get_maximum_container_memory
 from collections import deque
@@ -9,6 +9,7 @@ from collections import deque
 log = get_logger(__name__)
 LEGAL_STATES = {s for s, _ in YarnApplicationState}
 LEGAL_FINAL_STATUSES = {s for s, _ in FinalApplicationStatus}
+LEGAL_CLUSTER_CONTAINER_STATUSES = {s for s, _ in ClusterContainerSignal}
 
 
 def validate_yarn_application_state(state, required=False):
@@ -48,6 +49,17 @@ def validate_final_application_status(final_status, required=False):
     else:
         if required:
             msg = "final_status argument is required to be provided"
+            raise IllegalArgumentError(msg)
+
+
+def validate_cluster_container_status(cluster_container_status, required=False):
+    if cluster_container_status:
+        if cluster_container_status not in LEGAL_CLUSTER_CONTAINER_STATUSES:
+            msg = 'Cluster Container Status %s is illegal' % (cluster_container_status,)
+            raise IllegalArgumentError(msg)
+    else:
+        if required:
+            msg = "cluster_container_status argument is required to be provided"
             raise IllegalArgumentError(msg)
 
 
@@ -137,7 +149,7 @@ class ResourceManager(BaseYarnAPI):
                              started_time_begin=None, started_time_end=None,
                              finished_time_begin=None, finished_time_end=None,
                              application_types=None, application_tags=None,
-                             de_selects=None):
+                             name=None, de_selects=None):
         """
         With the Applications API, you can obtain a collection of resources,
         each of which represents an application.
@@ -162,6 +174,7 @@ class ResourceManager(BaseYarnAPI):
             application types, specified as a comma-separated list
         :param List[str] application_tags: applications matching any of the
             given application tags, specified as a comma-separated list
+        :param str name: name of the application
         :param List[str] de_selects: a generic fields which will be skipped in
             the result
         :returns: API response object with JSON data
@@ -188,6 +201,7 @@ class ResourceManager(BaseYarnAPI):
             ('finishedTimeEnd', finished_time_end),
             ('applicationTypes', ','.join(application_types) if application_types else None),
             ('applicationTags', ','.join(application_tags) if application_tags else None),
+            ('name', name),
             ('deSelects', ','.join(de_selects) if de_selects else None)
         )
 
@@ -203,7 +217,7 @@ class ResourceManager(BaseYarnAPI):
         state and the number of applications of this type and this state in
         ResourceManager context.
 
-        This method work in Hadoop > 2.0.0
+        This method only works in Hadoop > 2.0.0
 
         :param List[str] states: states of the applications. If states is not
             provided, the API will enumerate all application states and
@@ -375,6 +389,21 @@ class ResourceManager(BaseYarnAPI):
 
         return self.request(path)
 
+    def cluster_node_update_resource(self, node_id, data):
+        """
+        Update the total resources in a node.
+
+        For data body definition refer to:
+        (https://hadoop.apache.org/docs/current/hadoop-yarn/hadoop-yarn-site/ResourceManagerRest.html#Cluster_Node_Update_Resource_API)
+
+        :param dict data: resourceOption details
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/nodes/{nodeid}/resource'.format(nodeid=node_id)
+
+        return self.request(path, 'POST', json=data)
+
     def cluster_submit_application(self, data):
         """
         (This feature is currently in the alpha stage and may change in the
@@ -386,7 +415,7 @@ class ResourceManager(BaseYarnAPI):
         capabilities available on the cluster.
 
         For data body definition refer to:
-        (https://hadoop.apache.org/docs/current/hadoop-yarn/hadoop-yarn-site/ResourceManagerRest.html#Cluster_Writeable_APIs)
+        (https://hadoop.apache.org/docs/current/hadoop-yarn/hadoop-yarn-site/ResourceManagerRest.html#Cluster_Applications_API.28Submit_Application.29)
 
         :param dict data: Application details
         :returns: API response object with JSON data
@@ -827,3 +856,122 @@ class ResourceManager(BaseYarnAPI):
         path = '/ws/v1/cluster/scheduler-conf'
 
         return self.request(path, 'PUT', json=data)
+
+    def cluster_container_signal(self, container_id, command):
+        """
+        With the Container Signal API, you can send a signal to a specified container
+        with one of the following commands:
+        OUTPUT_THREAD_DUMP, GRACEFUL_SHUTDOWN and FORCEFUL_SHUTDOWN.
+
+        :param str container_id: container id
+        :param str command: signal command
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+
+        validate_cluster_container_status(command, True)
+
+        path = '/ws/v1/cluster/containers/{containerid}/signal/{command}'.format(
+            containerid=container_id,
+            command=command
+        )
+
+        return self.request(path, 'POST')
+
+    def scheduler_activities(self, node_id=None, group_by=None):
+        """
+        The scheduler activities RESTful API is available if you are using capacity scheduler
+        and can fetch scheduler activities info recorded in a scheduling cycle.
+
+        The API returns a message that includes important scheduling activities info which
+        has a hierarchical layout with following fields:
+
+        * Activities - Activities is the root object of scheduler activities.
+        * Allocations - Allocations are allocation attempts based on partition or reservation.
+        * Hierarchical Queues - Hierarchical Queues where the scheduler have been tried to allocate
+        containers to, each of them contains queue name, allocation state, optional diagnostic and
+        optional children.
+        * Applications - Applications are shown as children of leaf queue, each of them contains the
+        basic info about the application.
+        * Requests - Requests are shown as children of application, each of them contains the basic
+        info about the request.
+        * Nodes - Nodes are shown as children of request, each of them contains node id, allocation
+        state, optional name which should appear after allocating or reserving a container on the
+        node, and optional diagnostic which should present if failed to allocate or reserve a
+        container on this node. For aggregated nodes grouped by allocation state and diagnostic,
+        each of them contains allocation state, aggregated node IDs and optional diagnostic.
+
+        :param str node_id: specified node ID, if not specified, the scheduler will record the
+        scheduling activities info for the next scheduling cycle on all nodes.
+        :param str group_by: aggregation type of application activities, currently only support
+        “diagnostic” with which user can query aggregated activities grouped by allocation
+        state and diagnostic
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/scheduler/activities'
+
+        loc_args = (
+            ('nodeId', node_id),
+            ('groupBy', group_by)
+        )
+
+        params = self.construct_parameters(loc_args)
+
+        return self.request(path, params=params)
+
+    def application_activities(self, application_id, max_time=None,
+                                      request_priorities=None,
+                                      allocation_request_ids=None, group_by=None,
+                                      limit=None, actions=None, summarize=None):
+        """
+        Application activities RESTful API is available if you are using capacity scheduler and can
+        fetch useful scheduling info for a specified application, the response has a hierarchical
+        layout with following fields:
+
+        * AppActivities - AppActivities are root element of application activities within basic
+        information.
+        * Allocations - Allocations are allocation attempts at app level queried from the cache.
+        * Requests - Requests are shown as children of allocation, each of them contains request
+        name, request priority, allocation request id, allocation state and optional children.
+        * Nodes - Nodes are shown as children of request, each of them contains node id, allocation
+        state, optional name which should appear after allocating or reserving a container on the
+        node, and optional diagnostic which should appear if failed to allocate or reserve a
+        container on the node. For aggregated nodes grouped by allocation state and diagnostic, each
+        of them contains allocation state, aggregated node IDs and optional diagnostic.
+
+        :param int maxTime: the max duration in seconds from now on for recording application
+        activities. If not specified, this will default to 3 (seconds).
+        :param List[int] requestPriorities: the priorities of request, used to filter application
+        activities
+        :param List[int] allocationRequestIds: the allocation request IDs of request, used to filter
+        application activities
+        :param str groupBy: the aggregation type of application activities, currently only
+        support “diagnostic” with which user can query aggregated activities grouped by
+        allocation state and diagnostic.
+        :param str limit: the limit of application activities which can reduce the cost for both
+        server and client side.
+        :param List[str] actions: the required actions of app activities including “refresh” and
+        “get”
+        :param boolean summarize: whether app activities in multiple scheduling processes need to be
+        summarized, specified as boolean, it’s useful when multi-node placement disabled, because
+        only one node can be considered in a single scheduling process, enabling this can give us a
+        summary with diagnostics on all nodes.
+        :returns: API response object with JSON data
+        :rtype: :py:class:`yarn_api_client.base.Response`
+        """
+        path = '/ws/v1/cluster/scheduler/app-activities/{appid}'.format(appid=application_id)
+
+        loc_args = (
+            ('maxTime', max_time),
+            ('requestPriorities', ','.join(request_priorities) if request_priorities else None),
+            ('allocationRequestIds', ','.join(allocation_request_ids) if allocation_request_ids else None),
+            ('groupBy', group_by),
+            ('limit', limit),
+            ('actions', ','.join(actions) if actions else None),
+            ('summarize', summarize)
+        )
+
+        params = self.construct_parameters(loc_args)
+
+        return self.request(path, params=params)
