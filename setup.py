@@ -43,9 +43,8 @@ setup(
     author = 'Iskandarov Eduard',
     author_email = 'e.iskandarov@corp.mail.ru',
     license = 'BSD',
-    url = 'https://github.com/toidi/hadoop-yarn-api-python-client',
+    url = 'https://github.com/CODAIT/hadoop-yarn-api-python-client',
     classifiers = [
-        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
