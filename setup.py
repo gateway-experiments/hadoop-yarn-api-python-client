@@ -42,6 +42,8 @@ setup(
 
     author = 'Iskandarov Eduard',
     author_email = 'e.iskandarov@corp.mail.ru',
+    maintainer = 'Dmitry Romanenko',
+    maintainer_email = 'dmitry@romanenko.in',
     license = 'BSD',
     url = 'https://github.com/CODAIT/hadoop-yarn-api-python-client',
     classifiers = [
