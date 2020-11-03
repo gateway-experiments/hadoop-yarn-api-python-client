@@ -41,7 +41,7 @@ setup(
     test_suite = 'tests',
 
     author = 'Iskandarov Eduard',
-    author_email = 'e.iskandarov@corp.mail.ru',
+    author_email = None,
     maintainer = 'Dmitry Romanenko',
     maintainer_email = 'dmitry@romanenko.in',
     license = 'BSD',
