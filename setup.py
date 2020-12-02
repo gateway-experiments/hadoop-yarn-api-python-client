@@ -41,11 +41,12 @@ setup(
     test_suite = 'tests',
 
     author = 'Iskandarov Eduard',
-    author_email = 'e.iskandarov@corp.mail.ru',
+    author_email = 'eduard.iskandarov@ya.ru',
+    maintainer = 'Dmitry Romanenko',
+    maintainer_email = 'dmitry@romanenko.in',
     license = 'BSD',
-    url = 'https://github.com/toidi/hadoop-yarn-api-python-client',
+    url = 'https://github.com/CODAIT/hadoop-yarn-api-python-client',
     classifiers = [
-        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
