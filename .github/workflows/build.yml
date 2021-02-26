@@ -1,0 +1,36 @@
+name: Builds
+on:
+  push:
+    branches: '*'
+  pull_request:
+    branches: '*'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    env:
+      TOX_ENV: py${{ matrix.python-version}}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: [ '3.5', '3.6', '3.7', '3.8', '3.9' ]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        clean: true
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+        architecture: 'x64'
+    - name: Install dependencies
+      run: |
+        pip install --upgrade setuptools pip tox coveralls
+        pip freeze
+    - name: Run the tests
+      run: tox
+    - name: Code coverage
+      run: coveralls
+
