@@ -34,6 +34,9 @@ jobs:
         pip freeze
     - name: Run the tests
       run: tox
-    - name: Code coverage
-      run: coveralls
-
+# Not getting coveralls to work, commenting out for now.
+#    - name: Code coverage
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      run: |
+#        coveralls
