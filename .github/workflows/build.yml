@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
-        python-version: [ '3.5', '3.6', '3.7', '3.8', '3.9' ]
+        python-version: [ '3.6', '3.7', '3.8', '3.9' ]
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -25,9 +25,12 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
         architecture: 'x64'
+    - name: Install Dependencies (Linux)
+      run: sudo apt-get install libkrb5-dev
+      if: matrix.os == 'ubuntu-latest'
     - name: Install dependencies
       run: |
-        pip install --upgrade setuptools pip tox coveralls
+        pip install --upgrade setuptools pip tox tox-gh-actions coveralls
         pip freeze
     - name: Run the tests
       run: tox
