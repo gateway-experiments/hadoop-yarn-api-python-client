@@ -7,7 +7,7 @@ from .base import get_logger
 
 log = get_logger(__name__)
 
-CONF_DIR = os.getenv('HADOOP_CONF_DIR', '/etc/hadoop/conf')
+CONF_DIR = os.getenv('YARN_CONF_DIR', os.getenv('HADOOP_CONF_DIR', '/etc/hadoop/conf'))
 
 
 def _get_rm_ids(hadoop_conf_path):
