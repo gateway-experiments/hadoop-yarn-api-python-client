@@ -13,6 +13,5 @@ class SimpleAuth(requests.auth.AuthBase):
             r.raise_for_status()
             self.auth_token = _session.cookies.get_dict()['hadoop.auth']
             self.auth_done = True
-        else:
-            request.cookies.set("hadoop.auth", self.auth_token)
+        request.cookies.set("hadoop.auth", self.auth_token)
         return request
