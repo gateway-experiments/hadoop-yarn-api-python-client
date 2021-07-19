@@ -13,5 +13,12 @@ class SimpleAuth(requests.auth.AuthBase):
             r.raise_for_status()
             self.auth_token = _session.cookies.get_dict()['hadoop.auth']
             self.auth_done = True
-        request.cookies.set("hadoop.auth", self.auth_token)
+
+        # Borrowed from https://github.com/psf/requests/issues/2532#issuecomment-90126896
+        if 'Cookie' in request.headers:
+            old_cookies = request.headers['Cookie']
+            all_cookies = '; '.join([old_cookies, "{0}={1}".format("hadoop.auth", self.auth_token)])
+            request.headers['Cookie'] = all_cookies
+        else:
+            request.prepare_cookies({"hadoop.auth": self.auth_token})
         return request
