@@ -1,7 +1,7 @@
 import requests
 
 class SimpleAuth(requests.auth.AuthBase):
-    def __init__(self, username):
+    def __init__(self, username="yarn"):
         self.username = username
         self.auth_token = None
         self.auth_done = False
