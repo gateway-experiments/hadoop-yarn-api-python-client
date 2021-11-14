@@ -58,7 +58,7 @@ class Uri(object):
 class BaseYarnAPI(object):
     response_class = Response
 
-    def __init__(self, service_endpoint=None, timeout=None, auth=None, verify=True):
+    def __init__(self, service_endpoint=None, timeout=None, auth=None, verify=True, proxies=None):
         self.timeout = timeout
 
         if service_endpoint:
@@ -69,6 +69,7 @@ class BaseYarnAPI(object):
         self.session = requests.Session()
         self.session.auth = auth
         self.session.verify = verify
+        self.session.proxies = proxies
 
     def _validate_configuration(self):
         if not self.service_uri:
