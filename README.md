@@ -1,6 +1,6 @@
 # hadoop-yarn-api-python-client
 
-Python client for Apache Hadoop® YARN API
+Python client for Apache Hadoop® YARN API.
 
 [![Latest Version](https://img.shields.io/pypi/v/yarn-api-client.svg)](https://pypi.python.org/pypi/yarn-api-client/)
 [![Downloads](https://pepy.tech/badge/yarn-api-client/month)](https://pepy.tech/project/yarn-api-client/month)
@@ -12,6 +12,8 @@ Package documentation:
 [yarn-api-client-python.readthedocs.org](https://yarn-api-client-python.readthedocs.org/en/latest/)
 
 REST API documentation: [hadoop.apache.org](http://hadoop.apache.org/docs/stable/hadoop-yarn/hadoop-yarn-site/WebServicesIntro.html)
+
+**Warning**: CLI is outdated & broken. Please don't use CLI. This will be resolved in future releases.
 
 ---
 ## Compatibility Matrix
@@ -67,7 +69,7 @@ from requests_kerberos import HTTPKerberosAuth
 history_server = HistoryServer('https://127.0.0.2:5678', auth=HTTPKerberosAuth())
 ```
 
-PS: You __**need**__ to get valid kerberos ticket in systemwide kerberos cache before running your code, otherwise calls to kerberized environment won't go through (run kinit before proceeding to run code)
+PS: You **need** to get valid kerberos ticket in systemwide kerberos cache before running your code, otherwise calls to kerberized environment won't go through (run kinit before proceeding to run code)
 
 2. Second option - using `gssapi` package  
 
@@ -76,6 +78,8 @@ If you want to avoid using terminal calls, you have to perform SPNEGO handshake 
 # Usage
 
 ### CLI interface
+
+**Warning**: CLI is outdated & broken. Please don't use CLI. This will be resolved in future releases.
 
 1. First way
 ```
