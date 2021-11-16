@@ -18,7 +18,7 @@ REST API documentation: [hadoop.apache.org](http://hadoop.apache.org/docs/stable
 ---
 ## Compatibility Matrix
 
-| yarn-api-client-python | Hadoop |
+| yarn-api-client-python | Apache Hadoop |
 | ------------- | ------------- |
 | 1.0.2  | 3.2.1  |
 | 1.0.3  | 3.3.0, 3.3.1  |
