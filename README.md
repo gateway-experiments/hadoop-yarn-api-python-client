@@ -1,6 +1,6 @@
 # hadoop-yarn-api-python-client
 
-Python client for Apache Hadoop® YARN API.
+Python client for Apache Hadoop® YARN API
 
 [![Latest Version](https://img.shields.io/pypi/v/yarn-api-client.svg)](https://pypi.python.org/pypi/yarn-api-client/)
 [![Downloads](https://pepy.tech/badge/yarn-api-client/month)](https://pepy.tech/project/yarn-api-client/month)
