@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__version__ = '2.0.0.dev0'
+__version__ = '1.0.3'
 __all__ = ['ApplicationMaster', 'HistoryServer', 'NodeManager', 'ResourceManager']
 
 from .application_master import ApplicationMaster

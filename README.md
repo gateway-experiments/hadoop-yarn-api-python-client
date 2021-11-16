@@ -13,9 +13,15 @@ Package documentation:
 
 REST API documentation: [hadoop.apache.org](http://hadoop.apache.org/docs/stable/hadoop-yarn/hadoop-yarn-site/WebServicesIntro.html)
 
+**Warning**: CLI is outdated & broken. Please don't use CLI. This will be resolved in future releases.
+
 ---
-## Compatibility
-Library is compatible with Apache Hadoop __**3.2.1**__.  
+## Compatibility Matrix
+
+| yarn-api-client-python | Hadoop |
+| ------------- | ------------- |
+| 1.0.2  | 3.2.1  |
+| 1.0.3  | 3.3.0, 3.3.1  |
 
 If u have version other than mentioned (or vendored variant like Hortonworks), certain APIs might be not working or have differences in
 implementation. If u plan to use certain API long-term, you might want to make sure its not in Alpha stage in documentation.
@@ -37,6 +43,16 @@ From source code
 pip install git+https://github.com/CODAIT/hadoop-yarn-api-python-client.git
 ```
 
+## Enabling support for SimpleAuth
+
+See example below:
+```
+from yarn_api_client.auth import SimpleAuth
+from yarn_api_client.history_server import HistoryServer
+auth = SimpleAuth('impersonated_account_name')
+history_server = HistoryServer('https://127.0.0.2:5678', auth=auth)
+```
+
 ## Enabling support for Kerberos/SPNEGO Security
 1. First option - using `requests_kerberos` package  
 
@@ -53,7 +69,7 @@ from requests_kerberos import HTTPKerberosAuth
 history_server = HistoryServer('https://127.0.0.2:5678', auth=HTTPKerberosAuth())
 ```
 
-PS: You __**need**__ to get valid kerberos ticket in systemwide kerberos cache before running your code, otherwise calls to kerberized environment won't go through (run kinit before proceeding to run code)
+PS: You **need** to get valid kerberos ticket in systemwide kerberos cache before running your code, otherwise calls to kerberized environment won't go through (run kinit before proceeding to run code)
 
 2. Second option - using `gssapi` package  
 
@@ -62,6 +78,8 @@ If you want to avoid using terminal calls, you have to perform SPNEGO handshake 
 # Usage
 
 ### CLI interface
+
+**Warning**: CLI is outdated & broken. Please don't use CLI. This will be resolved in future releases.
 
 1. First way
 ```
@@ -82,6 +100,13 @@ app_information = am.application_information('application_id')
 ```
 
 ### Changelog
+
+1.0.3 Release
+   - Drop support of Python 2.7 (if you still need it for extreme emergency, look into reverting ab4f71582f8c69e908db93905485ba4d00562dfd)
+   - Update of supported hadoop version to 3.3.1
+   - Add support for YARN_CONF_DIR and HADOOP_CONF_DIR
+   - Add class for native SimpleAuth (#106)
+   - Add constructor argument for proxies (#109)
 
 1.0.2 Release
    - Add support for Python 3.8.x
