@@ -14,8 +14,12 @@ Package documentation:
 REST API documentation: [hadoop.apache.org](http://hadoop.apache.org/docs/stable/hadoop-yarn/hadoop-yarn-site/WebServicesIntro.html)
 
 ---
-## Compatibility
-Library is compatible with Apache Hadoop __**3.2.1**__.  
+## Compatibility Matrix
+
+| yarn-api-client-python | Hadoop |
+| ------------- | ------------- |
+| 1.0.2  | 3.2.1  |
+| 1.0.3  | 3.3.0, 3.3.1  |
 
 If u have version other than mentioned (or vendored variant like Hortonworks), certain APIs might be not working or have differences in
 implementation. If u plan to use certain API long-term, you might want to make sure its not in Alpha stage in documentation.
@@ -35,6 +39,16 @@ conda install -c conda-forge yarn-api-client
 From source code
 ```
 pip install git+https://github.com/CODAIT/hadoop-yarn-api-python-client.git
+```
+
+## Enabling support for SimpleAuth
+
+See example below:
+```
+from yarn_api_client.auth import SimpleAuth
+from yarn_api_client.history_server import HistoryServer
+auth = SimpleAuth('impersonated_account_name')
+history_server = HistoryServer('https://127.0.0.2:5678', auth=auth)
 ```
 
 ## Enabling support for Kerberos/SPNEGO Security
@@ -82,6 +96,13 @@ app_information = am.application_information('application_id')
 ```
 
 ### Changelog
+
+1.0.3 Release
+   - Drop support of Python 2.7 (if you still need it for extreme emergency, look into reverting ab4f71582f8c69e908db93905485ba4d00562dfd)
+   - Update of supported hadoop version to 3.3.1
+   - Add support for YARN_CONF_DIR and HADOOP_CONF_DIR
+   - Add class for native SimpleAuth (#106)
+   - Add constructor argument for proxies (#109)
 
 1.0.2 Release
    - Add support for Python 3.8.x
