@@ -83,7 +83,7 @@ class ResourceManager(BaseYarnAPI):
         we verify the server's TLS certificate, or a string, in which case it must
         be a path to a CA bundle to use. Defaults to ``True``
     """
-    def __init__(self, service_endpoints=None, timeout=30, auth=None, verify=True):
+    def __init__(self, service_endpoints=None, timeout=30, auth=None, verify=True, proxies=None):
         active_service_endpoint = None
         if not service_endpoints:
             active_service_endpoint = get_resource_manager_endpoint(timeout, auth, verify)
@@ -94,7 +94,7 @@ class ResourceManager(BaseYarnAPI):
                     break
 
         if active_service_endpoint:
-            super(ResourceManager, self).__init__(active_service_endpoint, timeout, auth, verify)
+            super(ResourceManager, self).__init__(active_service_endpoint, timeout, auth, verify, proxies)
         else:
             raise Exception("No active RMs found")
 
