@@ -50,9 +50,9 @@ def _get_resource_manager(hadoop_conf_path, rm_id=None):
     return ('https://' if is_https_only else 'http://') + rm_address if rm_address else None
 
 
-def check_is_active_rm(url, timeout=30, auth=None, verify=True):
+def check_is_active_rm(url, timeout=30, auth=None, verify=True, proxies=None):
     try:
-        response = requests.get(url + "/cluster", timeout=timeout, auth=auth, verify=verify)
+        response = requests.get(url + "/cluster", timeout=timeout, auth=auth, verify=verify, proxies=proxies)
     except requests.RequestException as e:
         log.warning("Exception encountered accessing RM '{url}': '{err}', continuing...".format(url=url, err=e))
         return False
@@ -64,7 +64,7 @@ def check_is_active_rm(url, timeout=30, auth=None, verify=True):
         return True
 
 
-def get_resource_manager_endpoint(timeout=30, auth=None, verify=True):
+def get_resource_manager_endpoint(timeout=30, auth=None, verify=True, proxies=None):
     log.info('Getting resource manager endpoint from config: {config_path}'.format(config_path=os.path.join(CONF_DIR, 'yarn-site.xml')))
     hadoop_conf_path = CONF_DIR
     rm_ids = _get_rm_ids(hadoop_conf_path)
@@ -72,7 +72,7 @@ def get_resource_manager_endpoint(timeout=30, auth=None, verify=True):
         for rm_id in rm_ids:
             ret = _get_resource_manager(hadoop_conf_path, rm_id)
             if ret:
-                if check_is_active_rm(ret, timeout, auth, verify):
+                if check_is_active_rm(ret, timeout, auth, verify, proxies):
                     return ret
         return None
     else:
@@ -93,12 +93,12 @@ def get_nodemanager_endpoint():
     return parse(config_path, prop_name)
 
 
-def get_webproxy_endpoint(timeout=30, auth=None, verify=True):
+def get_webproxy_endpoint(timeout=30, auth=None, verify=True, proxies=None):
     config_path = os.path.join(CONF_DIR, 'yarn-site.xml')
     log.info('Getting webproxy endpoint from config: {config_path}'.format(config_path=config_path))
     prop_name = 'yarn.web-proxy.address'
     value = parse(config_path, prop_name)
-    return value or get_resource_manager_endpoint(timeout, auth, verify)
+    return value or get_resource_manager_endpoint(timeout, auth, verify, proxies)
 
 
 def parse(config_path, key):

@@ -35,11 +35,11 @@ class NodeManager(BaseYarnAPI):
         we verify the server's TLS certificate, or a string, in which case it must
         be a path to a CA bundle to use. Defaults to ``True``
     """
-    def __init__(self, service_endpoint=None, timeout=30, auth=None, verify=True):
+    def __init__(self, service_endpoint=None, timeout=30, auth=None, verify=True, proxies=None):
         if not service_endpoint:
             service_endpoint = get_nodemanager_endpoint()
 
-        super(NodeManager, self).__init__(service_endpoint, timeout, auth, verify)
+        super(NodeManager, self).__init__(service_endpoint, timeout, auth, verify, proxies)
 
     def node_information(self):
         """

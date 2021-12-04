@@ -14,7 +14,7 @@ class AppMasterTestCase(TestCase):
     def test__init__(self, get_config_mock, request_mock):
         get_config_mock.return_value = None
         ApplicationMaster()
-        get_config_mock.assert_called_with(30, None, True)
+        get_config_mock.assert_called_with(30, None, True, None)
 
     def test_application_information(self, request_mock):
         self.app.application_information('app_100500')
