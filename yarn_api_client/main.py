@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import argparse
 from pprint import pprint
 
+from .auth import SimpleAuth
 from .base import get_logger
 from .constants import (YarnApplicationState, FinalApplicationStatus,
                         ApplicationState, JobStateInternal)
@@ -16,6 +17,10 @@ def get_parser():
         description='Client for Hadoop® YARN API')
 
     parser.add_argument('--endpoint', help='API endpoint (https://test.cluster.com:8090)')
+    #parser.add_argument('--api_class', help='Please provide api class - rm, hs, nm, am', required=True)
+    parser.add_argument('--timeout', help='Request timeout', default=30)
+    parser.add_argument('--auth', help='Authentication type', default=None,  choices=['simple', None])
+    parser.add_argument('--verify', help='Verify cert or not', default=True)
 
     subparsers = parser.add_subparsers()
     populate_resource_manager_arguments(subparsers)
@@ -34,7 +39,7 @@ def create_parsers(subparsers_instance, module_class, module_name, listing_of_ap
         )
         _new_parser.set_defaults(method=api)
         _method = getattr(module_class, api)
-        for _arg in _method.__code__.co_varnames:
+        for _arg in _method.__code__.co_varnames[:_method.__code__.co_argcount]:
             if _arg != 'self':
                 _new_parser.add_argument(_arg)
 
@@ -170,14 +175,22 @@ def main():
     opts = parser.parse_args()
 
     class_kwargs = {}
-    if not hasattr(opts, 'api_class'):
-        raise Exception("Please provide api class - rm, hs, nm, am")
     # Only ResourceManager supports HA
-    elif opts.endpoint:
+    if opts.endpoint:
         if opts.api_class == ResourceManager:
             class_kwargs['service_endpoints'] = opts.endpoint.split(",")
         else:
             class_kwargs['service_endpoint'] = opts.endpoint
+
+    # CLI requires some special accommodation for Auth - custom class imports
+    if opts.auth:
+        # Currenly only hadoop's SimpleAuth and none are supported out of the box
+        if opts.auth == 'simple':
+            class_kwargs['auth'] = SimpleAuth()
+        else:
+            raise Exception(
+                "This auth mentod is not supported by CLI, please write your own python script if needed"
+            )
 
     api = opts.api_class(**class_kwargs)
     # Construct positional arguments for method
