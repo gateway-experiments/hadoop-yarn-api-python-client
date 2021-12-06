@@ -26,11 +26,11 @@ class ApplicationMaster(BaseYarnAPI):
         we verify the server's TLS certificate, or a string, in which case it must
         be a path to a CA bundle to use. Defaults to ``True``
     """
-    def __init__(self, service_endpoint=None, timeout=30, auth=None, verify=True):
+    def __init__(self, service_endpoint=None, timeout=30, auth=None, verify=True, proxies=None):
         if not service_endpoint:
-            service_endpoint = get_webproxy_endpoint(timeout, auth, verify)
+            service_endpoint = get_webproxy_endpoint(timeout, auth, verify, proxies)
 
-        super(ApplicationMaster, self).__init__(service_endpoint, timeout, auth, verify)
+        super(ApplicationMaster, self).__init__(service_endpoint, timeout, auth, verify, proxies)
 
     def application_information(self, application_id):
         """
