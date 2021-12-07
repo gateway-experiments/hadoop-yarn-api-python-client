@@ -189,7 +189,7 @@ def main():
             class_kwargs['auth'] = SimpleAuth()
         else:
             raise Exception(
-                "This auth mentod is not supported by CLI, please write your own python script if needed"
+                f"This auth method ({opts.auth}) is not supported by the CLI."
             )
 
     api = opts.api_class(**class_kwargs)
