@@ -9,10 +9,12 @@ class SimpleAuth(requests.auth.AuthBase):
     def __call__(self, request):
         if not self.auth_done:
             _session = requests.Session()
-            r = _session.get(request.url, params={"user.name": self.username})
+            r = _session.get(request.url, params={"user.name": self.username}, allow_redirects=False)
             r.raise_for_status()
-            self.auth_token = _session.cookies.get_dict()['hadoop.auth']
-            self.auth_done = True
+
+            if 'This is standby RM.' not in r.text:
+                self.auth_token = _session.cookies.get_dict()['hadoop.auth']
+                self.auth_done = True
 
         # Borrowed from https://github.com/psf/requests/issues/2532#issuecomment-90126896
         if 'Cookie' in request.headers:
