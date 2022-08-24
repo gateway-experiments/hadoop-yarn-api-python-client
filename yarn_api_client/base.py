@@ -29,7 +29,15 @@ class Response(object):
         #: Dictionary with response data.  Handle cases where content is empty
         # to prevent JSON decode issues
         if response.content:
-            self.data = response.json()
+            try:
+                self.data = response.json()
+            except Exception:
+                err_values = ['"queueUsagePercentage":INF,']
+                response_data = response.text
+                for err_value in err_values:
+                    if err_value in response_data:
+                        response_data = response_data.replace(err_value, '"queueUsagePercentage":0.0,')
+                self.data = json.loads(response_data)
         else:
             self.data = {}
 
